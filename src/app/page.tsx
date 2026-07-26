@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePermission } from '@/hooks/usePermission';
+import InviteCodeModal from '@/components/InviteCodeModal';
 
 // -------------------- useInView Hook --------------------
 
@@ -51,11 +54,22 @@ function FadeIn({ children, className = '' }: { children: React.ReactNode; class
 // -------------------- 主页面 --------------------
 
 export default function HomePage() {
+  const router = useRouter();
   const [toastMsg, setToastMsg] = useState('');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const { hasPermission } = usePermission('tarot');
 
   function showToast(msg: string) {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(''), 2500);
+  }
+
+  function handleTarotClick() {
+    if (hasPermission) {
+      router.push('/tarot');
+    } else {
+      setShowInviteModal(true);
+    }
   }
 
   return (
@@ -63,10 +77,18 @@ export default function HomePage() {
 
       {/* ===== Toast ===== */}
       {toastMsg && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-primary/95 border border-accent text-accent px-6 py-3 rounded-full text-sm tracking-wider animate-fadeInUp">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-40 bg-primary/95 border border-accent text-accent px-6 py-3 rounded-full text-sm tracking-wider animate-fadeInUp">
           {toastMsg}
         </div>
       )}
+
+      {/* 邀请码弹窗 */}
+      <InviteCodeModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onSuccess={() => router.push('/tarot')}
+        requiredModule="tarot"
+      />
 
       {/* ===== 1. Hero 区域 ===== */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 text-center">
@@ -98,7 +120,7 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 塔罗占卜卡片 */}
-              <Link href="/tarot" className="group block">
+              <button onClick={handleTarotClick} className="group block w-full text-left">
                 <div className="h-full rounded-2xl border-2 border-accent/40 bg-primary/60 p-6 md:p-8 transition-all duration-300 group-hover:border-accent group-hover:-translate-y-1 group-hover:shadow-[0_0_30px_rgba(196,153,76,0.2)]">
                   <span className="text-4xl">🔮</span>
                   <h3 className="mt-4 text-xl md:text-2xl font-bold text-accent tracking-wider">塔罗占卜</h3>
@@ -107,7 +129,7 @@ export default function HomePage() {
                     事业 · 财运 · 桃花
                   </div>
                 </div>
-              </Link>
+              </button>
 
               {/* 人格测试卡片（即将上线） */}
               <button

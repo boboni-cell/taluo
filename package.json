@@ -9,15 +9,22 @@
     "lint": "next lint",
     "cf-build": "npx @cloudflare/next-on-pages",
     "deploy": "npx @cloudflare/next-on-pages && wrangler pages deploy .vercel/output/static",
-    "preview": "npx @cloudflare/next-on-pages && wrangler pages dev .vercel/output/static --d1=DB"
+    "preview": "npx @cloudflare/next-on-pages && wrangler pages dev .vercel/output/static --d1=DB",
+    "db:init": "wrangler d1 execute taluo-db --file=src/db/schema.sql",
+    "db:seed": "wrangler d1 execute taluo-db --file=src/db/seed.sql",
+    "db:reset": "wrangler d1 execute taluo-db --command 'DROP TABLE IF EXISTS user_permissions; DROP TABLE IF EXISTS code_permissions; DROP TABLE IF EXISTS invite_codes; DROP TABLE IF EXISTS permission_modules; DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS admins;' && wrangler d1 execute taluo-db --file=src/db/schema.sql && wrangler d1 execute taluo-db --file=src/db/seed.sql",
+    "db:create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
+    "@fingerprintjs/fingerprintjs": "^5.2.0",
+    "bcryptjs": "^3.0.3",
     "next": "^14.2.35",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

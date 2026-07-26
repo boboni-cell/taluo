@@ -72,3 +72,50 @@ body {
 .animate-pulseHint {
   animation: pulseHint 1.2s ease-in-out infinite;
 }
+
+/* ---- 弹窗动画 ---- */
+
+/* 遮罩层淡入 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* 弹窗卡片：淡入 + 放大 */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-modalIn {
+  animation: modalIn 0.3s ease-out forwards;
+}
+
+/* 错误抖动 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-6px); }
+  30%, 70% { transform: translateX(6px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* 对勾描边动画 */
+@keyframes checkDraw {
+  from { stroke-dashoffset: 30; }
+  to { stroke-dashoffset: 0; }
+}
+.animate-checkDraw {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: checkDraw 0.5s ease-out 0.15s forwards;
+}

@@ -12,8 +12,8 @@ pages_build_output_dir = ".vercel/output/static"
 [[d1_databases]]
 binding = "DB"
 database_name = "taluo-db"
-database_id = "YOUR_D1_DATABASE_ID"  # 替换为你的 D1 数据库 ID
+database_id = "e100f112-408f-401c-9926-a19fb31ea2e3"  # 替换为你的 D1 数据库 ID
 
-# 环境变量（可选）
-# [vars]
-# ADMIN_TOKEN = "your-admin-token"
+# 环境变量
+[vars]
+ADMIN_SECRET = "taluo-admin-secret-change-me-in-production"

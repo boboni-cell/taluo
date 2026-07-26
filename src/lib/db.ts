@@ -91,24 +91,12 @@ export function getDB(): D1Database {
   );
 }
 
-/** 获取请求上下文（Cloudflare Pages Functions） */
-// Cloudflare Pages + next-on-pages 环境中可通过 AsyncLocalStorage 获取 context
-// 参考: https://github.com/cloudflare/next-on-pages
-let getRequestContext: (() => { env: Record<string, unknown> }) | null = null;
-
-try {
-  // 尝试加载 @cloudflare/next-on-pages 的 context 工具
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const nextOnPages = require('@cloudflare/next-on-pages/next-dev');
-  getRequestContext = nextOnPages?.getRequestContext;
-} catch {
-  // 本地开发时可能加载失败，忽略
-}
-
+/** 获取请求上下文中的环境变量（Cloudflare Pages Functions） */
+// @cloudflare/next-on-pages 在本地开发时通过 setupDevPlatform 注入 process.env 绑定
+// 生产环境中 Cloudflare Workers 自动将 D1 绑定注入 process.env
 export function getCFEnv(): Record<string, unknown> {
-  if (getRequestContext) {
-    return getRequestContext().env;
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env as unknown as Record<string, unknown>;
   }
-  // 回退到 process.env
-  return process.env as unknown as Record<string, unknown>;
+  return {};
 }

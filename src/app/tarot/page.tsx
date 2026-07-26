@@ -1,11 +1,22 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SPREADS } from '@/data/tarot-spreads';
+import { usePermission } from '@/hooks/usePermission';
+import InviteCodeModal from '@/components/InviteCodeModal';
 
 export default function TarotPage() {
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const { hasPermission, isLoading } = usePermission('tarot');
+
+  // 权限检查完成后，无权限则弹窗
+  useEffect(() => {
+    if (!isLoading && !hasPermission) {
+      setShowInviteModal(true);
+    }
+  }, [isLoading, hasPermission]);
 
   return (
     <main className="min-h-screen bg-dark px-4 py-10 sm:px-8 sm:py-16">
@@ -44,6 +55,14 @@ export default function TarotPage() {
         <footer className="mt-16 text-center">
           <a href="/" className="text-sm text-cream/30 tracking-wider transition-colors hover:text-cream/60">← 返回首页</a>
         </footer>
+
+        {/* 邀请码弹窗 */}
+        <InviteCodeModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          onSuccess={() => setShowInviteModal(false)}
+          requiredModule="tarot"
+        />
       </div>
     </main>
   );
