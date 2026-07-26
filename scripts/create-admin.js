@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 const username = 'admin';
 const password = 'admin123';  // 默认密码，部署后务必修改
@@ -12,7 +12,11 @@ console.log('生成的 hash:', hash);
 console.log('正在写入数据库...');
 
 try {
-  execSync(`npx wrangler d1 execute taluo-db --remote --command "${sql}"`, { stdio: 'inherit' });
+  execFileSync(
+    'npx',
+    ['wrangler', 'd1', 'execute', 'taluo-db', '--remote', '--command', sql],
+    { stdio: 'inherit' }
+  );
   console.log('\n✅ 管理员创建成功！');
   console.log('   用户名:', username);
   console.log('   密码:', password);
