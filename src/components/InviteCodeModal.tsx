@@ -139,7 +139,7 @@ export default function InviteCodeModal({ isOpen, onClose, onSuccess, requiredMo
 
                 {/* 副标题 */}
                 <p className="text-sm text-cream/50 text-center mb-6">
-                  关注小红书 @你的账号名 获取邀请码
+                  关注小红书 @你的账号名 获取邀请码{requiredModule ? `（${requiredModule === 'tarot' ? '塔罗占卜' : requiredModule} 模块需要激活后才能使用）` : ''}
                 </p>
 
                 {/* 输入框区域 */}

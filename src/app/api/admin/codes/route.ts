@@ -5,7 +5,7 @@
  */
 
 // 部署到 Cloudflare 时取消注释：
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
 import { getDB } from '@/lib/db';

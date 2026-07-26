@@ -9,6 +9,8 @@
  * 删除邀请码（需管理权限）
  */
 
+export const runtime = 'edge';
+
 import { NextResponse } from 'next/server';
 
 export async function GET() {
