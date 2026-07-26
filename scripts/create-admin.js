@@ -1,14 +1,19 @@
 const bcrypt = require('bcryptjs');
 const { execFileSync } = require('child_process');
 
-const username = 'admin';
-const password = 'admin123';  // 默认密码，部署后务必修改
+const username = process.env.ADMIN_USERNAME;
+const password = process.env.ADMIN_PASSWORD;
+
+if (!username || !password) {
+  console.error('请设置 ADMIN_USERNAME 和 ADMIN_PASSWORD 环境变量');
+  process.exit(1);
+}
 
 const hash = bcrypt.hashSync(password, 10);
 
-const sql = `INSERT OR REPLACE INTO admins (id, username, password_hash) VALUES (1, '${username}', '${hash}')`;
+const escapedUsername = username.replaceAll("'", "''");
+const sql = `INSERT OR REPLACE INTO admins (id, username, password_hash) VALUES (1, '${escapedUsername}', '${hash}')`;
 
-console.log('生成的 hash:', hash);
 console.log('正在写入数据库...');
 
 try {
@@ -19,8 +24,6 @@ try {
   );
   console.log('\n✅ 管理员创建成功！');
   console.log('   用户名:', username);
-  console.log('   密码:', password);
-  console.log('   ⚠️  部署后请立即修改密码');
 } catch (e) {
   console.error('\n❌ 写入失败，请手动执行以下 SQL：');
   console.log(sql);
