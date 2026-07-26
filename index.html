@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="塔罗牌在线占卜，免费抽取属于你的命运之牌。事业运、财运、桃花运，三牌阵深度解读，探索你的内心世界。">
+  <meta name="keywords" content="塔罗牌,在线占卜,塔罗占卜,免费塔罗,爱情占卜,事业占卜,财运占卜,命运,三牌阵">
+  <meta property="og:title" content="塔罗占卜屋 - 在线塔罗牌占卜">
+  <meta property="og:description" content="选择你想问的问题，抽取属于你的牌。免费在线塔罗占卜，事业、财运、桃花一探究竟。">
+  <meta property="og:type" content="website">
+  <title>塔罗占卜屋 - 在线塔罗牌占卜 | 事业运 · 财运 · 桃花运</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 星空背景 -->
+  <div class="stars-container" id="stars-container"></div>
+
+  <!-- 音效开关 -->
+  <button class="audio-toggle muted" id="audio-toggle" title="音效开关">🔇</button>
+
+  <!-- 主应用容器 -->
+  <div id="app">
+
+    <!-- ===== 首页 ===== -->
+    <div class="page home-page" id="home-page">
+      <div class="home-logo">🔮</div>
+      <h1 class="home-title">塔罗占卜屋</h1>
+      <p class="home-subtitle">选择你想问的问题，抽取属于你的牌</p>
+      <div class="divider"></div>
+
+      <div class="question-buttons">
+        <button class="btn-question" data-type="career">
+          <span class="icon">💼</span>
+          <span class="label">事业运</span>
+        </button>
+        <button class="btn-question" data-type="wealth">
+          <span class="icon">💰</span>
+          <span class="label">财运</span>
+        </button>
+        <button class="btn-question" data-type="love">
+          <span class="icon">💕</span>
+          <span class="label">桃花运</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== 模式选择页 ===== -->
+    <div class="page mode-select page-hidden" id="mode-select-page">
+      <button class="btn btn-outline btn-home" style="align-self:flex-start;margin-left:20px;">← 返回首页</button>
+      <h2 class="mode-title">选择占卜方式</h2>
+      <div class="mode-options">
+        <button class="btn-mode" data-mode="single">
+          <div class="mode-icon">🃏</div>
+          <div class="mode-label">单张占卜</div>
+          <div class="mode-desc">快速指引，一目了然</div>
+        </button>
+        <button class="btn-mode" data-mode="spread">
+          <div class="mode-icon">🌟</div>
+          <div class="mode-label">三牌阵</div>
+          <div class="mode-desc">过去·现在·未来，深度解读</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== 抽牌页面 ===== -->
+    <div class="page draw-page page-hidden" id="draw-page">
+      <button class="btn btn-outline btn-home" style="align-self:flex-start;">← 返回首页</button>
+
+      <div class="draw-header">
+        <h2 class="draw-title" id="draw-title">请抽取一张牌</h2>
+        <p class="draw-hint" id="draw-hint">静心凝神，跟随直觉选择一张牌</p>
+        <p class="spread-mode-hint" id="spread-hint" style="display:none;">
+          当前抽取：<span class="position-name">过去</span>
+        </p>
+      </div>
+
+      <!-- 卡牌网格 -->
+      <div class="cards-grid" id="cards-grid">
+        <!-- JS 动态渲染 -->
+      </div>
+
+      <!-- 解读区域 -->
+      <div class="reading-area" id="reading-area">
+        <!-- JS 动态渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 分享卡片遮罩 -->
+  <div class="share-card-overlay" id="share-overlay">
+    <button class="share-card-close" id="share-close">✕</button>
+    <div class="share-card" id="share-card">
+      <!-- JS 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- JS 脚本 -->
+  <script src="js/tarot-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
