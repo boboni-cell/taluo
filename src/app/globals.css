@@ -2,26 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 塔罗占卜屋 - 全局样式 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --primary: #2C1810;
+  --accent: #C4994C;
+  --cream: #F5F0E8;
+  --dark: #1A0F0A;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: #F5F0E8;
+  background: #1A0F0A;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* 自定义动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* 冥想呼吸动画 */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* 洗牌 Step1：散开 */
+@keyframes shuffleScatter {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.9); opacity: 0.9; }
+}
+/* 洗牌 Step2：切牌上下交替换位 */
+@keyframes shuffleSwap {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-30px); }
+  75% { transform: translateY(30px); }
+}
+/* 洗牌 Step3：飞向最终位置 */
+@keyframes shuffleToPosition {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0.5; }
+  100% { transform: translate(var(--fx), var(--fy)) rotate(0deg) scale(1); opacity: 1; }
+}
+
+/* 脉冲提示：当前应翻的牌 */
+@keyframes pulseHint {
+  0%, 100% { box-shadow: 0 0 8px rgba(196,153,76,0.3); }
+  50% { box-shadow: 0 0 24px rgba(196,153,76,0.7); }
+}
+.animate-pulseHint {
+  animation: pulseHint 1.2s ease-in-out infinite;
 }
