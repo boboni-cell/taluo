@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "cf-build": "npx @cloudflare/next-on-pages",
-    "deploy": "npx @cloudflare/next-on-pages && npx wrangler deploy",
+    "deploy": "npx @cloudflare/next-on-pages && echo '_worker.js' > .vercel/output/static/.assetsignore && npx wrangler deploy",
     "preview": "npx @cloudflare/next-on-pages && npx wrangler pages dev .vercel/output/static --d1=DB=e100f112-408f-401c-9926-a19fb31ea2e3",
     "db:init": "wrangler d1 execute taluo-db --remote --file=src/db/schema.sql",
     "db:init-local": "wrangler d1 execute taluo-db --local --file=src/db/schema.sql",
