@@ -1,10 +1,10 @@
 'use client';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { getCardById, type TarotCard } from '@/data/tarot-cards';
 import { getSpreadById, type TarotSpread } from '@/data/tarot-spreads';
 import { getCardRelation, getClassicCombination, analyzeSuitDensity } from '@/data/tarot-relations';
-import { getKeywords, generateCoreMeaning, generateDeepPositionInsight, generateDeepElementAnalysis, generatePersonalAdvice, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
+import { getKeywords, generateCoreMeaning, generateDeepPositionInsight, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
 import TarotChat from '@/components/TarotChat';
 
 /* ---- 牌面小图 ---- */
@@ -42,12 +42,10 @@ function CardReading({
   card: TarotCard & { pos: number; rev: boolean; posName: string };
   spread: TarotSpread;
 }) {
-  const meaning = generateCoreMeaning(card, card.rev);
-  const insight = useMemo(() => generateDeepPositionInsight(card, card.posName, card.rev), [card.id, card.rev, card.posName]);
-  const elementAnalysis = useMemo(() => generateDeepElementAnalysis(card, card.rev), [card.id, card.rev]);
-  const personalAdvice = useMemo(() => generatePersonalAdvice(card, card.rev), [card.id, card.rev]);
-  const keywords = useMemo(() => getKeywords(card, card.rev), [card.id, card.rev]);
+  const keywords = getKeywords(card, card.rev);
   const posDesc = spread.positions[card.pos]?.description || '';
+  const meaning = generateCoreMeaning(card, card.rev);
+  const insight = generateDeepPositionInsight(card, card.posName, card.rev, posDesc);
 
   return (
     <div className="bg-[#1A0F0A]/60 rounded-xl border border-accent/10 p-5 sm:p-6 space-y-4 animate-fadeInUp">
@@ -92,59 +90,23 @@ function CardReading({
         <KeywordTags keywords={keywords} />
       </div>
 
-      {/* 🌊 元素与能量分析 */}
-      {elementAnalysis && (
-        <div>
-          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🌊 元素与能量分析</h4>
-          <p className="text-sm sm:text-base text-cream/75 leading-relaxed whitespace-pre-line">{elementAnalysis}</p>
-        </div>
-      )}
-
-      {/* 💬 给你的话 */}
-      {personalAdvice && (
-        <div className="bg-accent/5 border border-accent/15 rounded-lg p-4 mt-2">
-          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">💬 给你的话</h4>
-          <p className="text-sm sm:text-base text-cream/70 italic leading-relaxed">{personalAdvice}</p>
-        </div>
-      )}
     </div>
   );
 }
 
 /* ---- 牌间关系区 ---- */
 function CardRelations({
-  cards, relations, combos, suitAnalysis,
+  relations, combos,
 }: {
-  cards: (TarotCard & { pos: number; rev: boolean; posName: string })[];
   relations: string[];
   combos: string[];
-  suitAnalysis: string | null;
 }) {
-  const hasAny = relations.length > 0 || combos.length > 0 || suitAnalysis;
-  const fallbackAnalysis: string[] = [];
-  if (!hasAny && cards.length >= 2) {
-    const majorCount = cards.filter(c => c.arcana === 'major').length;
-    if (majorCount > 0) {
-      fallbackAnalysis.push(majorCount >= cards.length * 0.5
-        ? `本次占卜中，大阿卡纳出现了${majorCount}张，说明当前处于人生重大转折期，命运的浪潮正在推动你的生命之舟。`
-        : `大阿卡纳出现了${majorCount}张，为日常的课题注入了一丝神圣的底色，请留意那些看似偶然的瞬间。`
-      );
-    }
-    const suitCounts: Record<string, number> = {};
-    for (const c of cards) { if (c.suit) suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1; }
-    const sorted = Object.entries(suitCounts).sort((a, b) => b[1] - a[1]);
-    const suitNames: Record<string, string> = { wands: '权杖', cups: '圣杯', swords: '宝剑', pentacles: '星币' };
-    const suitThemes: Record<string, string> = { wands: '行动和创造', cups: '情感和直觉', swords: '思维和沟通', pentacles: '物质和实际' };
-    for (const [suit, count] of sorted) {
-      if (count >= 2) fallbackAnalysis.push(`${suitNames[suit]}牌出现${count}张，${suitThemes[suit]}层面是当前的关键主题。`);
-    }
-    if (sorted.length === 0 && majorCount === 0) fallbackAnalysis.push('牌面以日常生活的细微能量为主，提醒你在平凡中见真知。');
-  }
+  if (!relations.length && !combos.length) return null;
 
   return (
     <div className="mt-8 animate-fadeInUp">
       <div className="mb-8 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-      <h2 className="text-lg sm:text-xl font-bold text-accent mb-5 tracking-[0.15em]">✦ 牌面关系洞察</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-accent mb-5 tracking-[0.15em]">✦ 牌与牌之间</h2>
       <div className="space-y-3">
         {combos.map((c, i) => (
           <div key={`combo-${i}`} className="bg-accent/5 border border-accent/20 rounded-lg p-4">
@@ -152,24 +114,12 @@ function CardRelations({
             <span className="text-sm text-cream/70 leading-relaxed">{c}</span>
           </div>
         ))}
-        {suitAnalysis && (
-          <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
-            <span className="text-accent text-sm mr-2">🎴</span>
-            <span className="text-sm text-cream/70 leading-relaxed">{suitAnalysis}</span>
-          </div>
-        )}
         {relations.slice(0, 5).map((r, i) => (
           <div key={`rel-${i}`} className="bg-accent/5 border border-accent/20 rounded-lg p-4">
             <span className="text-accent text-sm mr-2">🔗</span>
             <span className="text-sm text-cream/70 leading-relaxed">{r}</span>
           </div>
         ))}
-        {fallbackAnalysis.length > 0 && relations.length === 0 && combos.length === 0 && !suitAnalysis && (
-          <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
-            <span className="text-accent text-sm mr-2">🔍</span>
-            <span className="text-sm text-cream/70 leading-relaxed">{fallbackAnalysis.join(' ')}</span>
-          </div>
-        )}
       </div>
       <div className="mt-8 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
     </div>
@@ -212,19 +162,23 @@ export default function ReadingPage() {
     if (showAll) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
   }, [showAll]);
 
-  const relations: string[] = [];
   const combos = cards.length >= 2 ? getClassicCombination(cards) : [];
   const suitAnalysis = cards.length >= 3 ? analyzeSuitDensity(cards) : null;
+  const relationGroups = new Map<string, string[]>();
   for (let i = 0; i < cards.length - 1; i++) {
     for (let j = i + 1; j < cards.length; j++) {
       const rel = getCardRelation(cards[i], cards[j]);
-      if (rel) relations.push(`${cards[i].nameZh} + ${cards[j].nameZh}：${rel}`);
+      if (rel) {
+        const pair = `${cards[i].nameZh} + ${cards[j].nameZh}`;
+        relationGroups.set(rel, [...(relationGroups.get(rel) || []), pair]);
+      }
     }
   }
+  const relations = Array.from(relationGroups, ([relation, pairs]) => `${pairs.join('、')}：${relation}`);
 
   const ctx: ReadingContext | null = spread ? { spread, cards, relations, combos, suitAnalysis } : null;
-  const guidance = useMemo(() => ctx ? generateComprehensiveGuidance(ctx) : null, [data?.timestamp, cards.map(c => c.id).join(',')]);
-  const fullGuidanceText = useMemo(() => guidance ? `${guidance.intro}\n\n${guidance.trend}\n\n${guidance.outro}` : '', [guidance]);
+  const guidance = ctx ? generateComprehensiveGuidance(ctx) : null;
+  const fullGuidanceText = guidance ? `${guidance.intro}\n\n${guidance.trend}\n\n${guidance.outro}` : '';
 
   function showToast(m: string) {
     const e = document.createElement('div');
@@ -286,7 +240,7 @@ export default function ReadingPage() {
         )}
 
         {/* 牌间关系 */}
-        {showAll && cards.length >= 2 && <CardRelations cards={cards} relations={relations} combos={combos} suitAnalysis={suitAnalysis} />}
+        {showAll && cards.length >= 2 && <CardRelations relations={relations} combos={combos} />}
 
         {/* 综合指引 */}
         {showAll && guidance && (

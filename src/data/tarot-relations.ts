@@ -32,12 +32,12 @@ export function getCardRelation(card1: TarotCard, card2: TarotCard): string | nu
     if (sum === 21) return '镜像张力：两张大阿卡纳编号之和为21，互为镜像，张力中蕴含互补的智慧';
     const stage1 = card1.id <= 7 ? 1 : card1.id <= 14 ? 2 : 3;
     const stage2 = card2.id <= 7 ? 1 : card2.id <= 14 ? 2 : 3;
-    if (card1.id < card2.id) return `愚人之旅推进：${card1.nameZh}→${card2.nameZh}，经历从${stage1===1?'建立身份':stage1===2?'内在修正':'阴影整合'}到${stage2===1?'建立身份':stage2===2?'内在修正':'阴影整合'}的旅程`;
-    if (card1.id > card2.id) return `愚人之旅倒序：${card1.nameZh}→${card2.nameZh}，倒退回到更早的课题重新学习`;
+    if (card1.id < card2.id) return `愚人之旅推进：课题从${stage1===1?'建立身份':stage1===2?'内在修正':'阴影整合'}走向${stage2===1?'建立身份':stage2===2?'内在修正':'阴影整合'}`;
+    if (card1.id > card2.id) return '愚人之旅回溯：当前议题需要回到更早的课题重新检查';
   }
   if (card1.suit && card2.suit && card1.suit === card2.suit && card1.number && card2.number) {
-    if (card1.number < card2.number) return `同花色数字旅程：${card1.nameZh}→${card2.nameZh}，从小到大的推进，能量逐步展开`;
-    if (card1.number > card2.number) return `同花色数字旅程：${card1.nameZh}→${card2.nameZh}，从大到小的重启，回到基础重新出发`;
+    if (card1.number < card2.number) return '同花色递进：能量正从基础阶段走向更成熟的表达';
+    if (card1.number > card2.number) return '同花色回溯：当前议题需要回到基础环节重新检查';
   }
   const elements: Record<string,string> = { wands:'火', cups:'水', swords:'风', pentacles:'土' };
   const e1 = card1.suit ? elements[card1.suit] : '';
