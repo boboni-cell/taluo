@@ -8,7 +8,6 @@ export const runtime = 'edge';
 import { NextResponse } from 'next/server';
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
-const DEFAULT_KEY = 'sk-61d8457e2a144d699575a81878c5ef26';
 const MODEL_FALLBACKS = ['deepseek-v4-flash', 'deepseek-chat', 'deepseek-v4'];
 
 function getApiKey(): string {
@@ -19,7 +18,7 @@ function getApiKey(): string {
     const g = globalThis as unknown as Record<string, unknown>;
     if (g.DEEPSEEK_API_KEY) return g.DEEPSEEK_API_KEY as string;
   } catch { /* ignore */ }
-  return DEFAULT_KEY;
+  return ''; // 部署时通过 Cloudflare Dashboard 设置环境变量
 }
 
 async function tryModels(
