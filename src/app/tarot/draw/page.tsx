@@ -160,9 +160,9 @@ function DrawContent() {
                       left: `${layout.left}%`, top: `${layout.top}%`,
                       transform: `translate(-50%, -50%)${layout.rotate ? ` rotate(${layout.rotate}deg)` : ''}${layout.scale ? ` scale(${layout.scale})` : ''}`,
                     }}>
-                    <div className="w-12 h-18 sm:w-16 sm:h-24 rounded-sm border border-accent overflow-hidden flex flex-col items-center justify-between p-0.5 bg-[#F5F0E8]"
-                      style={{ transform: item.isReversed ? 'rotate(180deg)' : 'none' }}>
-                      <div className="w-full flex-1 rounded-sm flex items-center justify-center bg-[rgba(44,24,16,0.06)] relative overflow-hidden">
+                    <div className="w-12 h-18 sm:w-16 sm:h-24 rounded-sm border border-accent overflow-hidden flex flex-col items-center justify-between p-0.5 bg-[#F5F0E8]">
+                      <div className="w-full flex-1 rounded-sm flex items-center justify-center bg-[rgba(44,24,16,0.06)] relative overflow-hidden"
+                        style={{ transform: item.isReversed ? 'rotate(180deg)' : 'none' }}>
                         {item.card.image ? (
                           <img src={item.card.image} alt={item.card.nameZh}
                             className="w-full h-full object-contain"

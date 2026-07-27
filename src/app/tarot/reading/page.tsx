@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { getCardById, type TarotCard } from '@/data/tarot-cards';
 import { getSpreadById, type TarotSpread } from '@/data/tarot-spreads';
 import { getCardRelation, getClassicCombination, analyzeSuitDensity } from '@/data/tarot-relations';
-import { getKeywords, generatePositionInsight, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
+import { getKeywords, generateCoreMeaning, generateDeepPositionInsight, generateDeepElementAnalysis, generatePersonalAdvice, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
+import TarotChat from '@/components/TarotChat';
 
 /* ---- 牌面小图 ---- */
 function CardThumb({ src, alt, rev }: { src: string; alt: string; rev: boolean }) {
@@ -41,8 +42,10 @@ function CardReading({
   card: TarotCard & { pos: number; rev: boolean; posName: string };
   spread: TarotSpread;
 }) {
-  const meaning = card.rev ? card.reversedMeaning : card.uprightMeaning;
-  const insight = useMemo(() => generatePositionInsight(card, card.posName, card.rev), [card.id, card.rev, card.posName]);
+  const meaning = generateCoreMeaning(card, card.rev);
+  const insight = useMemo(() => generateDeepPositionInsight(card, card.posName, card.rev), [card.id, card.rev, card.posName]);
+  const elementAnalysis = useMemo(() => generateDeepElementAnalysis(card, card.rev), [card.id, card.rev]);
+  const personalAdvice = useMemo(() => generatePersonalAdvice(card, card.rev), [card.id, card.rev]);
   const keywords = useMemo(() => getKeywords(card, card.rev), [card.id, card.rev]);
   const posDesc = spread.positions[card.pos]?.description || '';
 
@@ -88,6 +91,22 @@ function CardReading({
         <h4 className="text-sm font-semibold text-accent mb-1 tracking-wider">🌟 关键词提炼</h4>
         <KeywordTags keywords={keywords} />
       </div>
+
+      {/* 🌊 元素与能量分析 */}
+      {elementAnalysis && (
+        <div>
+          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🌊 元素与能量分析</h4>
+          <p className="text-sm sm:text-base text-cream/75 leading-relaxed whitespace-pre-line">{elementAnalysis}</p>
+        </div>
+      )}
+
+      {/* 💬 给你的话 */}
+      {personalAdvice && (
+        <div className="bg-accent/5 border border-accent/15 rounded-lg p-4 mt-2">
+          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">💬 给你的话</h4>
+          <p className="text-sm sm:text-base text-cream/70 italic leading-relaxed">{personalAdvice}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -188,6 +207,11 @@ export default function ReadingPage() {
     if (cards.length) { const t = setTimeout(() => setShowAll(true), 800); return () => clearTimeout(t); }
   }, [cards]);
 
+  // 页面加载后自动滚回顶部
+  useEffect(() => {
+    if (showAll) { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  }, [showAll]);
+
   const relations: string[] = [];
   const combos = cards.length >= 2 ? getClassicCombination(cards) : [];
   const suitAnalysis = cards.length >= 3 ? analyzeSuitDensity(cards) : null;
@@ -272,6 +296,20 @@ export default function ReadingPage() {
               <p>{fullGuidanceText}</p>
             </div>
           </div>
+        )}
+
+        {/* AI 塔罗师对话 */}
+        {showAll && (
+          <TarotChat
+            spreadName={spread.nameZh}
+            cards={cards.map(c => ({
+              name: c.nameZh,
+              position: c.posName,
+              isReversed: c.rev,
+              keywords: (c.rev ? c.reversed : c.upright).replace(/[（(]阻塞[\/、]过度[\/、]内化[）)]/g, ''),
+              meaning: c.rev ? c.reversedMeaning : c.uprightMeaning,
+            }))}
+          />
         )}
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
