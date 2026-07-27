@@ -140,14 +140,13 @@ export async function POST(request: Request) {
     await db.batch(insertStmts);
 
     const newUsedCount = codeRow.used_count + 1;
-    const newStatus = newUsedCount >= codeRow.max_uses ? 'activated' : codeRow.status;
     const activatedAt = codeRow.activated_at || now;
 
     await db
       .prepare(
         'UPDATE invite_codes SET used_count = ?, status = ?, activated_at = ? WHERE id = ?'
       )
-      .bind(newUsedCount, newStatus, activatedAt, codeRow.id)
+      .bind(newUsedCount, 'activated', activatedAt, codeRow.id)
       .run();
 
     // ---- 8. 查询用户当前所有权限 ----
