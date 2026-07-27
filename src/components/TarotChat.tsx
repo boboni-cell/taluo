@@ -35,7 +35,7 @@ const WELCOME_MSG = '你好呀 ✨ 我是星见，刚刚看了你的牌面。有
 function cleanMessage(text: string): React.ReactNode[] {
   if (!text) return [text];
   // 移除 Markdown 加粗、斜体
-  let cleaned = text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+  const cleaned = text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
   // 按双换行分段
   return cleaned.split('\n\n').map((para, i) => (
     <p key={i} className={i > 0 ? 'mt-2' : ''}>

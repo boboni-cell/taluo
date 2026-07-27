@@ -4,8 +4,6 @@
 
 import type { TarotCard } from '@/data/tarot-cards';
 
-function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
-
 export interface SummaryContext {
   spreadName: string;
   cards: (TarotCard & { pos: number; rev: boolean; posName: string })[];
