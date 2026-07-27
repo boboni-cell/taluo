@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { getCardById, type TarotCard } from '@/data/tarot-cards';
 import { getSpreadById, type TarotSpread } from '@/data/tarot-spreads';
 import { getCardRelation, getClassicCombination, analyzeSuitDensity } from '@/data/tarot-relations';
-import { getKeywords, generateCoreMeaning, generateDeepPositionInsight, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
+import { getCardMeaning, getKeywords, generateCoreMeaning, generateDeepPositionInsight, generateComprehensiveGuidance, type ReadingContext } from '@/lib/reading-templates';
 import TarotChat from '@/components/TarotChat';
 
 /* ---- 牌面小图 ---- */
@@ -23,18 +23,6 @@ function CardThumb({ src, alt, rev }: { src: string; alt: string; rev: boolean }
   );
 }
 
-/* ---- 关键词标签 ---- */
-function KeywordTags({ keywords }: { keywords: string[] }) {
-  if (!keywords.length) return null;
-  return (
-    <div className="flex flex-wrap gap-1.5 mt-3">
-      {keywords.map((k, i) => (
-        <span key={i} className="inline-block px-2.5 py-0.5 text-[11px] text-accent border border-accent/40 rounded-full tracking-wider">{k}</span>
-      ))}
-    </div>
-  );
-}
-
 /* ---- 单牌解读区块 ---- */
 function CardReading({
   card, spread,
@@ -42,7 +30,6 @@ function CardReading({
   card: TarotCard & { pos: number; rev: boolean; posName: string };
   spread: TarotSpread;
 }) {
-  const keywords = getKeywords(card, card.rev);
   const posDesc = spread.positions[card.pos]?.description || '';
   const meaning = generateCoreMeaning(card, card.rev);
   const insight = generateDeepPositionInsight(card, card.posName, card.rev, posDesc);
@@ -64,31 +51,25 @@ function CardReading({
         </div>
       </div>
 
-      {/* 🔮 核心牌义 */}
+      {/* 🔮 牌面象征与感受 */}
       <div>
-        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🔮 核心牌义</h4>
-        <p className="text-sm sm:text-base text-cream/75 leading-relaxed">{meaning || '这张牌的能量正在向你传递信息。'}</p>
+        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🔮 牌面低语</h4>
+        <p className="text-sm sm:text-base text-cream/75 leading-loose whitespace-pre-line">{meaning}</p>
       </div>
 
       {/* 💡 位置化启示 */}
       <div>
-        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">💡 在这个位置的启示</h4>
-        <p className="text-sm sm:text-base text-cream/75 leading-relaxed">{insight}</p>
+        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">✦ 它落在「{card.posName}」</h4>
+        <p className="text-sm sm:text-base text-cream/75 leading-loose whitespace-pre-line">{insight}</p>
       </div>
 
       {/* 🧠 心理原型（仅大阿卡纳） */}
       {card.arcana === 'major' && card.psychologicalArchetype && (
         <div className="bg-accent/5 border border-accent/15 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🧠 心理原型</h4>
+          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🜂 它触碰的内在原型</h4>
           <p className="text-xs sm:text-sm text-cream/60 italic leading-relaxed">{card.psychologicalArchetype}</p>
         </div>
       )}
-
-      {/* 🌟 关键词 */}
-      <div>
-        <h4 className="text-sm font-semibold text-accent mb-1 tracking-wider">🌟 关键词提炼</h4>
-        <KeywordTags keywords={keywords} />
-      </div>
 
     </div>
   );
@@ -260,8 +241,8 @@ export default function ReadingPage() {
               name: c.nameZh,
               position: c.posName,
               isReversed: c.rev,
-              keywords: (c.rev ? c.reversed : c.upright).replace(/[（(]阻塞[\/、]过度[\/、]内化[）)]/g, ''),
-              meaning: c.rev ? c.reversedMeaning : c.uprightMeaning,
+              keywords: getKeywords(c, c.rev).join('、'),
+              meaning: getCardMeaning(c, c.rev),
             }))}
           />
         )}
