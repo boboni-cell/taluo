@@ -4,7 +4,7 @@
  * 兼容 Node.js 和 Edge Runtime
  */
 
-const SECRET_KEY = 'ADMIN_SECRET';
+import { getRequestContext } from '@cloudflare/next-on-pages';
 
 interface JWTPayload {
   adminId: number;
@@ -33,15 +33,18 @@ function base64UrlDecode(str: string): Uint8Array {
 }
 
 function getSecret(): string {
-  // 尝试多个来源获取密钥
+  // 方式1：Cloudflare Workers/Pages 生产环境（Dashboard 环境变量）
+  try {
+    const ctx = getRequestContext();
+    const env = ctx.env as Record<string, unknown>;
+    if (env && env.ADMIN_SECRET) return env.ADMIN_SECRET as string;
+  } catch { /* getRequestContext 在非 Cloudflare 环境会抛出异常 */ }
+
+  // 方式2：本地开发环境（next dev / .env.local）
   if (typeof process !== 'undefined' && process.env) {
-    if (process.env[SECRET_KEY]) return process.env[SECRET_KEY];
     if (process.env.ADMIN_SECRET) return process.env.ADMIN_SECRET;
   }
-  try {
-    const g = globalThis as unknown as Record<string, unknown>;
-    if (g.ADMIN_SECRET) return g.ADMIN_SECRET as string;
-  } catch { /* ignore */ }
+
   // 本地开发默认密钥
   return 'dev-secret-change-in-production';
 }

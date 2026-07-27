@@ -1,7 +1,7 @@
 /**
  * D1 数据库工具函数
  *
- * Cloudflare Workers 环境中，D1 绑定通过 process.env.DB 获取。
+ * Cloudflare Workers 环境中，D1 绑定通过 getRequestContext().env 或 process.env.DB 获取。
  * 本地开发时（`next dev`）使用模拟实现，避免报错。
  *
  * 使用方法：
@@ -9,6 +9,8 @@
  *   const db = getDB();
  *   const result = await db.prepare('SELECT * FROM users').all();
  */
+
+import { getRequestContext } from '@cloudflare/next-on-pages';
 
 // D1 数据库接口（精简版，仅包含常用方法）
 export interface D1Result<T = unknown> {
@@ -75,7 +77,14 @@ class MockD1Database implements D1Database {
 
 /** 获取 D1 数据库实例 */
 export function getDB(): D1Database {
-  // Cloudflare Workers 环境：通过 process.env 获取绑定
+  // 方式1：Cloudflare Workers/Pages 生产环境（通过 getRequestContext）
+  try {
+    const ctx = getRequestContext();
+    const env = ctx.env as Record<string, unknown>;
+    if (env && env.DB) return env.DB as unknown as D1Database;
+  } catch { /* getRequestContext 在非 Cloudflare 环境会抛出异常 */ }
+
+  // 方式2：Cloudflare Workers 环境（next-on-pages 注入 process.env）
   if (typeof process !== 'undefined' && process.env && process.env.DB) {
     return process.env.DB as unknown as D1Database;
   }
@@ -92,9 +101,13 @@ export function getDB(): D1Database {
 }
 
 /** 获取请求上下文中的环境变量（Cloudflare Pages Functions） */
-// @cloudflare/next-on-pages 在本地开发时通过 setupDevPlatform 注入 process.env 绑定
-// 生产环境中 Cloudflare Workers 自动将 D1 绑定注入 process.env
 export function getCFEnv(): Record<string, unknown> {
+  // 优先从 getRequestContext 获取（Dashboard 设置的自定义环境变量）
+  try {
+    const ctx = getRequestContext();
+    if (ctx?.env) return ctx.env as Record<string, unknown>;
+  } catch { /* ignore */ }
+
   if (typeof process !== 'undefined' && process.env) {
     return process.env as unknown as Record<string, unknown>;
   }

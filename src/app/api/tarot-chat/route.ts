@@ -6,19 +6,29 @@
 export const runtime = 'edge';
 
 import { NextResponse } from 'next/server';
+import { getRequestContext } from '@cloudflare/next-on-pages';
 
 const DEEPSEEK_URL = 'https://api.deepseek.com/chat/completions';
 const MODEL_FALLBACKS = ['deepseek-v4-flash', 'deepseek-chat', 'deepseek-v4'];
 
-function getApiKey(): string {
-  if (typeof process !== 'undefined' && process.env?.DEEPSEEK_API_KEY) {
-    return process.env.DEEPSEEK_API_KEY;
-  }
+function getEnvVar(name: string): string {
+  // 方式1：Cloudflare Workers/Pages 生产环境（通过 Dashboard 设置的环境变量）
   try {
-    const g = globalThis as unknown as Record<string, unknown>;
-    if (g.DEEPSEEK_API_KEY) return g.DEEPSEEK_API_KEY as string;
-  } catch { /* ignore */ }
-  return ''; // 部署时通过 Cloudflare Dashboard 设置环境变量
+    const ctx = getRequestContext();
+    const env = ctx.env as Record<string, unknown>;
+    if (env && env[name]) return env[name] as string;
+  } catch { /* getRequestContext 在非 Cloudflare 环境会抛出异常 */ }
+
+  // 方式2：本地开发环境（next dev）
+  if (typeof process !== 'undefined' && process.env?.[name]) {
+    return process.env[name] as string;
+  }
+
+  return '';
+}
+
+function getApiKey(): string {
+  return getEnvVar('DEEPSEEK_API_KEY');
 }
 
 async function tryModels(
