@@ -118,25 +118,34 @@ export default function TarotChat({ spreadName, cards }: Props) {
 
         const decoder = new TextDecoder();
         let fullContent = '';
+        let pending = '';
+
+        const processLine = (line: string) => {
+          if (!line.startsWith('data:')) return;
+
+          const data = line.slice(5).trim();
+          if (!data || data === '[DONE]') return;
+
+          try {
+            const parsed = JSON.parse(data);
+            const delta = parsed.choices?.[0]?.delta?.content || '';
+            fullContent += delta;
+            setStreaming(fullContent);
+          } catch { /* ignore malformed complete lines */ }
+        };
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
-
-          for (const line of lines) {
-            const data = line.slice(6).trim();
-            if (data === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(data);
-              const delta = parsed.choices?.[0]?.delta?.content || '';
-              fullContent += delta;
-              setStreaming(fullContent);
-            } catch { /* skip malformed chunks */ }
-          }
+          pending += decoder.decode(value, { stream: true });
+          const lines = pending.split('\n');
+          pending = lines.pop() || '';
+          lines.forEach(processLine);
         }
+
+        pending += decoder.decode();
+        if (pending) processLine(pending);
 
         setMessages(prev => [...prev, { role: 'assistant', content: fullContent }]);
       } catch {
