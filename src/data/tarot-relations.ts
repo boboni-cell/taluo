@@ -29,25 +29,25 @@ export function getClassicCombination(cards: TarotCard[]): string[] {
 export function getCardRelation(card1: TarotCard, card2: TarotCard): string | null {
   if (card1.arcana === 'major' && card2.arcana === 'major') {
     const sum = card1.id + card2.id;
-    if (sum === 21) return '镜像张力：两张大阿卡纳编号之和为21，互为镜像，张力中蕴含互补的智慧';
+    if (sum === 21) return `${card1.nameZh}和${card2.nameZh}像在从两个方向谈同一件事：一边想往前走，一边提醒你别跳过还没处理完的部分`;
     const stage1 = card1.id <= 7 ? 1 : card1.id <= 14 ? 2 : 3;
     const stage2 = card2.id <= 7 ? 1 : card2.id <= 14 ? 2 : 3;
-    if (card1.id < card2.id) return `愚人之旅推进：课题从${stage1===1?'建立身份':stage1===2?'内在修正':'阴影整合'}走向${stage2===1?'建立身份':stage2===2?'内在修正':'阴影整合'}`;
-    if (card1.id > card2.id) return '愚人之旅回溯：当前议题需要回到更早的课题重新检查';
+    if (card1.id < card2.id) return `两张牌放在一起，事情正从${stage1===1?'确认自己要什么':stage1===2?'调整内在状态':'面对不愿承认的问题'}，走向${stage2===1?'确认自己要什么':stage2===2?'调整内在状态':'面对不愿承认的问题'}`;
+    if (card1.id > card2.id) return '后面的牌把你带回了一个更早的问题；现在这件事想要往前，旧的那一关还得重新看一遍';
   }
   if (card1.suit && card2.suit && card1.suit === card2.suit && card1.number && card2.number) {
-    if (card1.number < card2.number) return '同花色递进：能量正从基础阶段走向更成熟的表达';
-    if (card1.number > card2.number) return '同花色回溯：当前议题需要回到基础环节重新检查';
+    if (card1.number < card2.number) return `${card1.nameZh}走到${card2.nameZh}，说明同一个问题正在往下一阶段发展，不再只是刚开始时的状态`;
+    if (card1.number > card2.number) return `${card1.nameZh}和${card2.nameZh}的顺序在往回走，说明现在需要先补上一个被忽略的基础环节`;
   }
   const elements: Record<string,string> = { wands:'火', cups:'水', swords:'风', pentacles:'土' };
   const e1 = card1.suit ? elements[card1.suit] : '';
   const e2 = card2.suit ? elements[card2.suit] : '';
   if (e1 && e2 && e1 !== e2) {
     const pair = [e1,e2].sort().join('');
-    if (pair === '风火') return '风火互助：思维与行动力相互激发，推进力强但可能缺乏沉淀';
-    if (pair === '水土') return '水土互助：情感与现实互相滋养，稳健但需防停滞';
-    if (pair === '火水') return '火水相蒸：行动力与情感相互消耗，需要找到平衡点';
-    if (pair === '风土') return '风土相僵：思考与物质现实互相制约，容易陷入僵局';
+    if (pair === '风火') return '想法和行动在互相推动，进展可能很快，但别急到没想清楚就做';
+    if (pair === '水土') return '感受和现实条件能够互相支持，适合稳稳推进，但也要小心因为求稳而停住';
+    if (pair === '火水') return '想马上行动的冲动和心里的感受在打架，先把情绪安顿好，再决定怎么做';
+    if (pair === '风土') return '脑子里想得很多，现实条件却跟不上；先解决一个最具体的限制，比继续分析更有用';
   }
   return null;
 }
@@ -60,11 +60,11 @@ export function analyzeSuitDensity(cards: TarotCard[]): string | null {
     else if (c.suit) counts[c.suit] = (counts[c.suit] || 0) + 1;
   }
   const total = cards.length;
-  if (majorCount > total * 0.5) return `大阿卡纳占比超过50%（${majorCount}/${total}），重大转折正在发生，命运的力量在起作用`;
+  if (majorCount > total * 0.5) return `这组牌里大阿卡纳很多，说明眼前的问题不只是一个小插曲，更像一次需要认真面对的转折`;
   const maxSuit = Object.entries(counts).sort((a,b) => b[1] - a[1])[0];
   if (maxSuit && maxSuit[1] >= Math.max(3, total * 0.5)) {
     const names: Record<string,string> = { wands:'权杖(火)', cups:'圣杯(水)', swords:'宝剑(风)', pentacles:'星币(土)' };
-    return `${names[maxSuit[0]]}花色密集（${maxSuit[1]}/${total}张），${maxSuit[0]==='cups'?'情感与关系主题突出':maxSuit[0]==='wands'?'行动与创造的能量主导':maxSuit[0]==='swords'?'思维和冲突议题凸显':'物质和实际事务为主轴'}`;
+    return `${names[maxSuit[0]]}出现得最多，所以这次的重点是${maxSuit[0]==='cups'?'感情、关系和真实感受':maxSuit[0]==='wands'?'要不要行动，以及怎么把力气用对地方':maxSuit[0]==='swords'?'沟通、事实和停止反复猜测':'金钱、时间、安全感和现实安排'}`;
   }
   return null;
 }

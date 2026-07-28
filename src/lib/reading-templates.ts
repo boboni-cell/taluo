@@ -128,27 +128,27 @@ const SPECIAL_MINOR_SYMBOLISM: Record<number, string> = {
 };
 
 const SUIT_SYMBOLS: Record<string, string> = {
-  wands: '权杖承载火元素，谈的是欲望、勇气与“我是否愿意行动”',
-  cups: '圣杯承载水元素，盛放感受、关系，以及那些不容易被直接说出的需要',
-  swords: '宝剑承载风元素，切开想象与事实，也会让反复思考的痛感变得清晰',
-  pentacles: '星币承载土元素，把问题带回身体、金钱、时间和真正能够握住的生活',
+  wands: '权杖这组牌主要讲行动、热情，以及你到底愿不愿意迈出那一步',
+  cups: '圣杯这组牌主要讲感受和关系，也包括那些一直没能直接说出口的需要',
+  swords: '宝剑这组牌主要讲思考、沟通和事实，也会照见想太多带来的疲惫',
+  pentacles: '星币这组牌很现实，讲的是身体、金钱、时间和生活里的安全感',
 };
 
 const RANK_SYMBOLS: Record<number, string> = {
-  1: '王牌是一颗刚落到手中的种子，潜力很真，但仍需要被接住',
-  2: '数字二让两股力量彼此照见，选择与关系由此出现',
-  3: '数字三让最初的想法开始长出形状，并邀请他人参与',
-  4: '数字四试图建立稳定，也会检验这种稳定是否已经变成停滞',
-  5: '数字五打破原有平衡，让冲突迫使真实问题浮出水面',
-  6: '数字六寻找重新流动的方式，让失衡有机会被修复',
-  7: '数字七把人带到考验前，要求重新评估坚持的理由',
-  8: '数字八带来推进与熟练，也提醒节奏过快时容易失去感受',
-  9: '数字九已经接近完成，累积的力量与疲惫会同时显现',
-  10: '数字十走到周期尽头，完成、负担与下一轮转化彼此相连',
-  11: '侍从像刚收到讯息的学习者，好奇心比成熟答案更重要',
-  12: '骑士把花色的力量带上路，追求会成为动力，也可能走向极端',
-  13: '皇后把力量收进内在，以感受、照料和成熟承接它',
-  14: '国王把力量带到外部世界，考验如何负责地掌控与运用',
+  1: '王牌像一颗刚拿到手的种子，机会是真的，但还需要你去接住',
+  2: '数字二通常会带来两个人、两种选择，或两股力量之间的拉扯',
+  3: '数字三说明一件事开始成形，也往往需要别人加入',
+  4: '数字四想把事情稳下来，但太稳也可能变成停在原地',
+  5: '数字五会打破原来的平衡，让一直躲着的问题浮出来',
+  6: '数字六在找回平衡，事情开始有机会重新顺起来',
+  7: '数字七带来一次考验，问你为什么还要继续坚持',
+  8: '数字八讲推进和熟练，也提醒你别只顾赶路',
+  9: '数字九已经很接近完成，所以力量和疲惫会一起出现',
+  10: '数字十走到了一个周期的末尾，旧事需要收尾，新一轮才会开始',
+  11: '侍从像刚收到消息的学习者，重点是保持好奇，先别装作什么都懂',
+  12: '骑士会把事情往前推，但冲得太快也容易走过头',
+  13: '皇后讲的是怎么照顾一件事、一个人，也包括怎么照顾自己',
+  14: '国王关心的是怎么把局面管好，也考验你会不会用好手里的力量',
 };
 
 function getCardSymbolism(card: TarotCard): string {
@@ -218,10 +218,13 @@ export function getCardMeaning(card: TarotCard, rev: boolean): string {
   return softenDomainLanguage(special || original || '这张牌邀请你留意当前处境中最突出的感受与变化。');
 }
 
-type ReversalMode = 'excess' | 'internalized' | 'blocked';
+type ReversalMode = 'excess' | 'internalized' | 'blocked' | 'release';
 
 function getReversalMode(card: TarotCard): ReversalMode {
   const meaning = card.reversedMeaning || '';
+  if (/恢复|疗愈|走出|走出来|解脱|松动|松开|释放|消散|散去|复苏|重获|站起来|正在过去|好转|减轻|摆脱|接受现实|真相浮现|否极泰来/.test(meaning)) {
+    return 'release';
+  }
   if (/过度|太过|控制|冲动|贪婪|自负|独裁|强势|极端/.test(meaning)) {
     return 'excess';
   }
@@ -232,48 +235,49 @@ function getReversalMode(card: TarotCard): ReversalMode {
 }
 
 function getDirection(card: TarotCard, rev: boolean): string {
-  if (!rev) return '正位让这股力量自然地向外流动，你也更容易看见它正在怎样影响现实';
+  if (!rev) return '它是正位，这股力量目前比较顺，现实里也更容易看见它的作用';
   switch (getReversalMode(card)) {
-    case 'excess': return '逆位让原本有帮助的力量用得太满，保护、坚持或掌控因此逐渐变成压力';
-    case 'internalized': return '逆位把变化带进了内心；外面未必已经显露，你的感受却先一步知道事情正在改变';
-    case 'blocked': return '逆位说明这股力量暂时被卡住了；它不是失败，而是在等待阻力被真正看见';
+    case 'release': return '它虽然是逆位，但这里更像在松绑和恢复：问题还没完全过去，你已经开始从里面走出来了';
+    case 'excess': return '但它是逆位，问题不是你做得不够，而是可能用力过头，原本的保护和坚持反而成了压力';
+    case 'internalized': return '它以逆位出现，说明变化更多发生在心里；外面还不明显，但你其实已经感觉到不对劲了';
+    case 'blocked': return '它以逆位出现，说明事情并非完全没机会，只是眼下确实有个地方卡住了';
   }
 }
 
 function getEmotionalBridge(card: TarotCard, rev: boolean): string {
   if (card.id === 13) {
-    return '如果这张牌让你紧张，先不用害怕。它触碰的是人面对改变时很真实的舍不得：明知一段状态已经走到尽头，却还没有准备好面对空出来的位置。';
+    return '先别被“死神”这个名字吓到。它说的是一段旧状态该结束了，而真正难的，是你可能还舍不得放手。';
   }
   if (card.id === 16) {
-    return '它承认失去稳定感会让人不安，也承认你可能已经很努力地维持局面。牌面邀请你问的不是“会不会崩塌”，而是“什么已经无法再支撑我”。';
+    return '高塔不是在预告灾难。它更像一句实话：有些东西已经撑不住了，与其继续硬扛，不如先找出哪里最不稳。';
   }
   if (card.id === 15) {
-    return '这张牌不责怪你的依恋。人会抓住熟悉的东西，往往是因为它曾经提供过安全感；看见锁链，才有可能温柔而清醒地松开它。';
+    return '这张牌不是在责怪你的执着。人会抓住一件事，通常是因为它曾经给过安全感；先承认这一点，才谈得上松开。';
   }
   if (card.id === 59) {
-    return '这张牌不会轻描淡写你已经承受的疲惫。它只是把微弱的晨光也放进画面里：到了最低处，并不等于故事只能停在那里。';
+    return '它不会把难受说得很轻巧，但也有一个很明确的意思：最糟的阶段走到头以后，接下来才有可能真正恢复。';
   }
 
   const themes = getKeywords(card, rev).slice(0, 2).join('、');
   if (card.arcana === 'major') {
-    return `大阿卡纳往往触及的不是一件小事，而是你正在经历的内在阶段。读到“${themes}”时，先留意身体和情绪的第一反应——那通常比急着判断吉凶更接近这张牌与你的连接。`;
+    return `这是一张大阿卡纳，所以“${themes}”不太像一时的小情绪，更像你最近绕不开的一门功课。`;
   }
 
   switch (card.suit) {
     case 'wands':
-      return `它触碰的是那种心里有火、却还要决定如何用力的时刻。感受一下“${themes}”在你身上更像热情，还是已经变成了压力。`;
+      return `说得实际一点，它在问：面对“${themes}”，你是真的想行动，还是只是心里着急？`;
     case 'cups':
-      return `这张牌先接住感受，不急着替你判断对错。“${themes}”背后也许藏着一个还没有被好好说出口的需要。`;
+      return `这张牌更关心你的真实感受。“${themes}”背后，可能有一句话一直没有好好说出来。`;
     case 'swords':
-      return `如果你最近一直在脑中反复推演，这张牌理解那种想把事情彻底想明白的疲惫。“${themes}”提醒你，清醒不等于必须对自己苛刻。`;
+      return `它提醒你别让脑子一直空转。“${themes}”需要的是看清事实，不是把每一种坏结果都提前想一遍。`;
     case 'pentacles':
-      return `它关心的是你真正赖以生活的东西：安全感、身体、时间与资源。“${themes}”并不抽象，它会落在你每天怎样照顾自己、怎样安排现实上。`;
+      return `它讲的不是玄乎的能量，而是现实里的时间、钱、身体和安全感。“${themes}”最后都要落到具体安排上。`;
     default:
-      return `这张牌邀请你慢一点感受“${themes}”，看看它在现实生活中最像哪一种正在发生的体验。`;
+      return `这张牌最想让你留意的是“${themes}”，看看它在现实里对应哪件具体的事。`;
   }
 }
 
-/** 以牌面意象开场，再承接牌义和真实感受。 */
+/** 用看得懂的口语连接牌面、牌义与现实。 */
 export function generateCoreMeaning(card: TarotCard, rev: boolean): string {
   const symbolism = getCardSymbolism(card);
   const meaning = getCardMeaning(card, rev);
@@ -281,13 +285,6 @@ export function generateCoreMeaning(card: TarotCard, rev: boolean): string {
 }
 
 type PositionKind = 'past' | 'present' | 'future' | 'challenge' | 'advice' | 'external' | 'inner' | 'root' | 'general';
-
-const SUIT_DOMAINS: Record<string, string> = {
-  wands: '行动与创造',
-  cups: '情感与关系',
-  swords: '思考与沟通',
-  pentacles: '资源与现实',
-};
 
 function getPositionKind(positionName: string): PositionKind {
   if (/过去/.test(positionName)) return 'past';
@@ -301,59 +298,48 @@ function getPositionKind(positionName: string): PositionKind {
   return 'general';
 }
 
-function getConcreteAction(card: TarotCard, rev: boolean): string {
-  const keyword = getKeywords(card, rev)[0] || '这张牌的主题';
-  if (card.arcana === 'major') return `围绕“${keyword}”写下你能控制与不能控制的部分，只对前者做一个决定`;
+function getConcreteAction(card: TarotCard): string {
+  if (card.arcana === 'major') return '把这件事里你能控制和不能控制的部分分别写下来，只对前者做一个决定';
   switch (card.suit) {
-    case 'wands': return `从“${keyword}”相关的想法里选一件，完成最小但真实的第一步`;
-    case 'cups': return `围绕“${keyword}”进行一次坦诚沟通，说清感受、需要和边界`;
-    case 'swords': return `把“${keyword}”涉及的事实与猜测分成两列，再依据事实判断`;
-    case 'pentacles': return `盘点“${keyword}”涉及的时间、金钱和现实资源，排出下一步`;
-    default: return `为“${keyword}”选一个本周能够完成的小动作`;
+    case 'wands': return '从最想做的事情里选一件，完成一个最小但真实的第一步';
+    case 'cups': return '找一次合适的机会，把自己的感受、需要和边界说清楚';
+    case 'swords': return '把已知事实和自己的猜测分开写，再根据事实做判断';
+    case 'pentacles': return '盘点现在能用的时间、金钱和现实资源，再排下一步';
+    default: return '选一个这周就能完成的小动作，不要只停在想法里';
   }
 }
 
-function getTheme(card: TarotCard, rev: boolean): string {
-  const keywords = getKeywords(card, rev).slice(0, 2).join('、');
-  const domain = card.suit ? SUIT_DOMAINS[card.suit] : '';
-  return [domain, keywords].filter(Boolean).join('中的');
-}
-
-/** 把牌义放进具体牌位，使用邀请式语言而非机械判定。 */
+/** 把牌义放进具体牌位，先把“这个位置到底说明什么”讲清楚。 */
 export function generateDeepPositionInsight(
   card: TarotCard,
   positionName: string,
   rev: boolean,
   positionDescription = '',
 ): string {
-  const theme = `“${getTheme(card, rev)}”`;
+  const theme = `“${getKeywords(card, rev).slice(0, 2).join('、')}”`;
   const direction = getDirection(card, rev);
 
   switch (getPositionKind(positionName)) {
     case 'past':
-      return `它落在“${positionName}”，所以这里讲的不是一段已经无关紧要的往事。${card.nameZh}把${theme}留在了现在的选择里，像一条不容易察觉的暗线。\n\n${direction}。${positionName.includes('远期') ? '你可以回想：是否有一种很早形成的自我保护方式，直到今天仍在替你作决定？' : '最近发生的事余温还在；与其催自己赶快翻篇，不如先承认它确实改变了你的感受。'}`;
+      return `它落在“${positionName}”，说明${theme}不是今天才出现的。以前的事也许已经过去，但你现在的判断里还留着它的影响。\n\n${direction}。${positionName.includes('远期') ? '你可以想一想：现在这个选择，有多少是在回应眼前，又有多少还是在保护过去的自己？' : '不用逼自己马上翻篇，先分清哪些是过去留下的反应，哪些才是眼前真正发生的事。'}`;
     case 'root':
-      return `作为“${positionName}”，${card.nameZh}沉在表面问题之下。${theme}可能是这一切真正的起点，只是它平时不一定会被直接说出来。\n\n${direction}。当你愿意照顾这层根基，外面的局面才有机会真正松动。`;
+      return `它在“${positionName}”，说的是表面问题下面真正起作用的东西。很多反复出现的状况，可能都绕不开${theme}。\n\n${direction}。先处理这个根上的问题，外面的局面才会真的变化。`;
     case 'present':
-      return `这张牌落在“${positionName}”，像一面正对着当下的镜子。它没有要求你马上解决所有事，而是先看清${theme}此刻怎样发生在你身上。\n\n${direction}。如果某一句让你有被说中的感觉，可以先停在那里——那通常就是这张牌最想让你看见的部分。`;
+      return `它落在“${positionName}”，所以这是眼下最需要正视的一点：${theme}。先不用急着判断整件事好不好，当前这一步看清了，后面才知道怎么走。\n\n${direction}。`;
     case 'challenge':
-      return `在“${positionName}”上，${card.nameZh}既是阻力，也是你可以取回的能力。真正让人辛苦的，也许不是缺少${theme}，而是不知道该把它用到什么程度。\n\n${direction}。牌面邀请你分辨：你是在保护自己，还是已经为了保护而把自己困住？`;
+      return `它落在“${positionName}”，说明真正难处理的是${theme}。这不只是阻碍，也正是最有可能出现突破的地方。\n\n${direction}。你现在需要分清：自己是在谨慎处理，还是已经因为害怕结果而不敢动了？`;
     case 'external':
-      return `它出现在“${positionName}”，说明${theme}更多由环境、规则或他人的态度触发。你可能已经感受到周围有些东西不愿改变，或有一股力量让你不得不保持警觉。\n\n${direction}。先别替别人预设答案；把能够确认的事实与内心的担忧分开，你会更清楚什么属于你、什么不需要由你承担。`;
+      return `它出现在“${positionName}”，说明${theme}更多来自环境、规则或别人的态度，不全是你一个人的问题。\n\n${direction}。先看对方实际做了什么，不要替别人脑补答案，也别把不属于你的责任全接过来。`;
     case 'inner':
-      return `这个位置照见的是你没有完全说出口的内在立场。${card.nameZh}让${theme}浮到水面，也承认期待与害怕有时会同时存在。\n\n${direction}。你不必急着消灭其中任何一面，先让两种声音都被听见，真正的选择才会出现。`;
+      return `这个位置说的是你心里真正的态度。${theme}可能一直都在，只是你还没有完全说出口；想要和害怕同时存在，也很正常。\n\n${direction}。先承认自己到底在期待什么、担心什么，再决定会更稳。`;
     case 'advice':
-      return `作为“${positionName}”，${card.nameZh}不是再给你一个抽象答案，而是邀请你把${theme}活进现实。${direction}。\n\n先不用做很大的改变。可以从这里开始：${getConcreteAction(card, rev)}。当行动足够小，内心才有空间诚实回应它是否适合你。`;
+      return `它在“${positionName}”，给的方向其实很直接：别只停在想法里，要处理${theme}。${direction}。\n\n先从一件小事开始：${getConcreteAction(card)}。做完再看结果，比继续猜更有用。`;
     case 'future':
-      return `在“${positionName}”，${card.nameZh}照见的是沿当前路径继续前行时，${theme}可能怎样展开。它更像远处的天气，而不是一份已经盖章的判决。\n\n${direction}。${positionName.includes('结果') ? '这是一种阶段性的落点，你今天的选择仍会改变它最终抵达的方式。' : '你现在看见这股趋势，正是为了在真正走到那里之前拥有调整的余地。'}`;
+      return `它落在“${positionName}”，不是说结果已经注定，而是提醒你：照现在的走法，${theme}会越来越明显。\n\n${direction}。${positionName.includes('结果') ? '这是目前最可能的落点，不是不能改变的判决。' : '现在提前看到这股趋势，就是为了让你还有时间调整。'}`;
     default:
-      return `结合“${positionName}”所代表的“${positionDescription || '当前议题'}”，${card.nameZh}邀请你从${theme}重新靠近这件事。\n\n${direction}。牌面不是替你作答，而是把一个原本模糊的感受照亮，让你能更诚实地回应自己。`;
+      return `“${positionName}”看的是${positionDescription || '当前最重要的问题'}。放在这里，${card.nameZh}把重点落在${theme}上。\n\n${direction}。先把这件具体的事看清，再谈它是好是坏。`;
   }
 }
-
-const SUIT_NAMES: Record<string, string> = {
-  wands: '权杖（火）', cups: '圣杯（水）', swords: '宝剑（风）', pentacles: '星币（土）',
-};
 
 export function generateSuitSummary(cards: { suit?: string; arcana: string }[]): string {
   const majorCount = cards.filter(card => card.arcana === 'major').length;
@@ -364,24 +350,23 @@ export function generateSuitSummary(cards: { suit?: string; arcana: string }[]):
 
   if (majorCount) {
     parts.push(majorCount >= cards.length / 2
-      ? `${majorCount}张大阿卡纳让这副牌触及较深的人生阶段，眼前的事可能正牵动你对方向和自我身份的理解`
-      : `${majorCount}张大阿卡纳藏在日常牌之间，说明具体生活里正夹着一层更深的成长课题`);
+      ? '大阿卡纳比较多，说明这不太像一个很快就会过去的小插曲，而是正好碰到了一次重要转折'
+      : '牌里出现了大阿卡纳，说明眼前这件具体的事，也在推动你重新看待自己的选择');
   }
   if (suits.length) {
     const [dominantSuit, count] = suits[0];
     const isDominant = count > (suits[1]?.[1] || 0);
-    parts.push(`牌面由${suits.map(([suit, value]) => `${SUIT_NAMES[suit] || suit}${value}张`).join('、')}构成`);
     if (isDominant) {
       const voices: Record<string, string> = {
-        wands: '火元素最响，事情正在问你是否愿意真正投入并行动',
-        cups: '水元素最响，关系与未说出口的感受是整组牌的心脏',
-        swords: '风元素最响，反复思考、沟通和真相辨认贯穿了整组牌',
-        pentacles: '土元素最响，安全感、资源与现实落地是无法绕开的主轴',
+        wands: '权杖最集中，重点在于你到底要不要行动，以及力气该往哪里用',
+        cups: '圣杯最集中，所以这次真正的重点是关系、感受和那些还没说出口的话',
+        swords: '宝剑最集中，说明你现在最需要的是看清事实、停止反复猜测并把话说清楚',
+        pentacles: '星币最集中，说明问题最后要回到现实：时间、钱、安全感和具体安排',
       };
       parts.push(voices[dominantSuit]);
     }
   }
-  return parts.join('；') + (parts.length ? '。' : '');
+  return parts.join('。') + (parts.length ? '。' : '');
 }
 
 export interface ReadingContext {
@@ -394,7 +379,7 @@ export interface ReadingContext {
 
 function cardTheme(card: TarotCard & { rev: boolean }): string {
   const keywords = getKeywords(card, card.rev).slice(0, 2).join('、');
-  return `${card.nameZh}${card.rev ? '逆位' : '正位'}所说的“${keywords}”`;
+  return `${card.nameZh}${card.rev ? '逆位' : '正位'}的“${keywords}”`;
 }
 
 function getSecondAction(cards: (TarotCard & { rev: boolean })[]): string {
@@ -412,32 +397,45 @@ function getSecondAction(cards: (TarotCard & { rev: boolean })[]): string {
 
 /** 把整组牌编织成一条故事，而不是再次罗列定义。 */
 export function generateComprehensiveGuidance(ctx: ReadingContext): { intro: string; trend: string; outro: string } {
-  const { spread, cards } = ctx;
+  const { cards } = ctx;
   if (!cards.length) return { intro: '', trend: '', outro: '' };
 
   const uprightCount = cards.filter(card => !card.rev).length;
   const reversedCount = cards.length - uprightCount;
   const balance = reversedCount > uprightCount
-    ? `有${reversedCount}张牌以逆位出现。它们并不是在否定你的努力，更像在说：有些力量并非不存在，只是卡在了还没被说清、还没被允许的地方。`
+    ? '逆位牌偏多，所以眼下的重点不是硬往前冲，而是先把真正卡住的地方弄明白。'
     : uprightCount > reversedCount
-      ? `有${uprightCount}张牌以正位出现，整副牌有一种逐渐向外舒展的感觉；你已经拥有一些可以真实调用的力量。`
-      : '正位与逆位彼此交错，像一次一边前行、一边回头确认内心的旅程。推进和整理，都不是多余的。';
-  const intro = `先把${spread.nameZh}的牌一起放远一点看。${balance}\n\n${generateSuitSummary(cards)}`;
+      ? '正位牌偏多，说明事情不是没路走，你手上已经有一些可以真正用起来的条件。'
+      : '正位和逆位差不多，说明一边有机会，一边也有顾虑；现在不适合只看好坏，要看哪一步最关键。';
+  const suitSummary = generateSuitSummary(cards);
+  const intro = `先说结论：${balance}${suitSummary ? ` ${suitSummary}` : ''}`;
 
   const first = cards[0];
   const middle = cards.length > 2 ? cards[Math.floor(cards.length / 2)] : null;
   const last = cards[cards.length - 1];
-  const beginning = `故事从“${first.posName}”的${cardTheme(first)}开始。它不是一张背景牌，而像一条从过去延伸过来的线，解释了你为什么会以现在的方式感受和选择。`;
+  const beginning = cards.length === 1
+    ? `${cardTheme(first)}是这次牌面的核心，它把重点落在“${getKeywords(first, first.rev).slice(0, 2).join('、')}”上。`
+    : `这组牌先从“${first.posName}”的${cardTheme(first)}说起，说明事情一开始就绕不开这一点。`;
   const turning = middle
-    ? `走到中段，“${middle.posName}”的${cardTheme(middle)}让故事转了方向：前面的经验在这里不再只是记忆，而开始要求你回应。`
+    ? `到了“${middle.posName}”，${cardTheme(middle)}是整个故事的转折：前面的影响到了这里，开始变成你现在必须面对的选择。`
     : '';
-  const ending = `最后，“${last.posName}”由${cardTheme(last)}收束。它没有替你宣布结局，而是让你看见：如果沿着现在的节奏走下去，什么会被带到下一阶段；你仍然可以在途中改变走法。`;
-  const trend = `${beginning}\n\n${turning ? `${turning}\n\n` : ''}${ending}`;
+  const ending = cards.length === 1
+    ? ''
+    : `最后落到“${last.posName}”的${cardTheme(last)}。这不是已经写死的结局，而是照现在的状态继续下去，最容易出现的走向。`;
+  const lastIsReleasing = last.rev && getReversalMode(last) === 'release';
+  const synthesis = cards.length === 1
+    ? '所以这次不用急着从牌里找一个绝对答案，先看看它指出的这个核心问题，是否正是你一直没有认真处理的部分。'
+    : last.rev && !lastIsReleasing
+      ? `连起来看，事情想从“${getKeywords(first, first.rev)[0]}”走向“${getKeywords(last, last.rev)[0]}”，但最后一步还有阻力。不是完全没可能，而是不能照原来的方式继续。`
+      : lastIsReleasing
+        ? `连起来看，事情正在从“${getKeywords(first, first.rev)[0]}”慢慢走向“${getKeywords(last, last.rev)[0]}”。恢复已经开始，但还需要时间，不能因为暂时没完全好就否定已经发生的变化。`
+      : `连起来看，整组牌正在从“${getKeywords(first, first.rev)[0]}”走向“${getKeywords(last, last.rev)[0]}”。方向已经出现，但能不能走到那里，要看你怎么回应中间这张关键牌。`;
+  const trend = `${beginning}${turning ? `\n\n${turning}` : ''}${ending ? `\n\n${ending}` : ''}\n\n${synthesis}`;
 
   const adviceCard = cards.find(card => /建议|行动|释放|指引/.test(card.posName)) || last;
   const relation = ctx.combos[0] || ctx.relations[0] || ctx.suitAnalysis;
-  const relationNote = relation ? `牌与牌之间最值得停留的一处回声是：${relation.replace(/^[^：]+：/, '')}。它让前后的牌不再是各说各话，而是在回应同一个核心。\n\n` : '';
-  const outro = `${relationNote}这次不需要你立刻完成一个巨大的改变。先做两件小而真实的事：\n① ${getConcreteAction(adviceCard, adviceCard.rev)}；\n② ${getSecondAction(cards)}。\n\n如果某张牌让你不舒服、舍不得，或有一种被说中的酸涩，那份感觉本身也是解读的一部分。牌面展示的是此刻能量的流向，最终的选择权始终在你手中。`;
+  const relationNote = relation ? `这几张牌之间还有一个很明显的联系：${relation.replace(/^[^：]+：/, '')}。\n\n` : '';
+  const outro = `${relationNote}眼下最有用的不是继续猜结果，而是先做两件具体的事。第一，${getConcreteAction(adviceCard)}。第二，${getSecondAction(cards)}。\n\n塔罗给的是现在这条路最可能的发展，不是替你作决定。哪一张牌让你最不舒服，往往就是最值得先处理的地方。`;
 
   return { intro, trend, outro };
 }

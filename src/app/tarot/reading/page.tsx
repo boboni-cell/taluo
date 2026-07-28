@@ -51,25 +51,17 @@ function CardReading({
         </div>
       </div>
 
-      {/* 🔮 牌面象征与感受 */}
+      {/* 牌面含义 */}
       <div>
-        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🔮 牌面低语</h4>
+        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">这张牌在说什么</h4>
         <p className="text-sm sm:text-base text-cream/75 leading-loose whitespace-pre-line">{meaning}</p>
       </div>
 
-      {/* 💡 位置化启示 */}
+      {/* 牌位含义 */}
       <div>
-        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">✦ 它落在「{card.posName}」</h4>
+        <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">放在「{card.posName}」怎么看</h4>
         <p className="text-sm sm:text-base text-cream/75 leading-loose whitespace-pre-line">{insight}</p>
       </div>
-
-      {/* 🧠 心理原型（仅大阿卡纳） */}
-      {card.arcana === 'major' && card.psychologicalArchetype && (
-        <div className="bg-accent/5 border border-accent/15 rounded-lg p-4">
-          <h4 className="text-sm font-semibold text-accent mb-2 tracking-wider">🜂 它触碰的内在原型</h4>
-          <p className="text-xs sm:text-sm text-cream/60 italic leading-relaxed">{card.psychologicalArchetype}</p>
-        </div>
-      )}
 
     </div>
   );
@@ -87,7 +79,7 @@ function CardRelations({
   return (
     <div className="mt-8 animate-fadeInUp">
       <div className="mb-8 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-      <h2 className="text-lg sm:text-xl font-bold text-accent mb-5 tracking-[0.15em]">✦ 牌与牌之间</h2>
+      <h2 className="text-lg sm:text-xl font-bold text-accent mb-5 tracking-[0.15em]">✦ 这几张牌放在一起</h2>
       <div className="space-y-3">
         {combos.map((c, i) => (
           <div key={`combo-${i}`} className="bg-accent/5 border border-accent/20 rounded-lg p-4">
@@ -201,9 +193,20 @@ export default function ReadingPage() {
           ))}
         </section>
 
+        {/* 综合结论 */}
+        {showAll && guidance && (
+          <section className="mb-8 animate-fadeInUp">
+            <h2 className="text-lg sm:text-xl font-bold text-accent mb-4 tracking-[0.15em]">✦ 先说整体</h2>
+            <div className="rounded-xl border border-accent/20 bg-accent/5 p-5 sm:p-6 text-sm sm:text-base text-cream/75 leading-loose space-y-4 whitespace-pre-line">
+              <p>{fullGuidanceText}</p>
+            </div>
+          </section>
+        )}
+
         {/* 逐牌解读 */}
         {showAll && (
           <section className="space-y-6">
+            <h2 className="text-lg sm:text-xl font-bold text-accent tracking-[0.15em]">✦ 再一张张看</h2>
             {cards.map((c, i) => (
               <div key={i}>
                 {i > 0 && <div className="my-6 h-px bg-gradient-to-r from-transparent via-accent/15 to-transparent" />}
@@ -222,16 +225,6 @@ export default function ReadingPage() {
 
         {/* 牌间关系 */}
         {showAll && cards.length >= 2 && <CardRelations relations={relations} combos={combos} />}
-
-        {/* 综合指引 */}
-        {showAll && guidance && (
-          <div className="mt-8 animate-fadeInUp">
-            <h2 className="text-lg sm:text-xl font-bold text-accent mb-4 tracking-[0.15em]">✦ 综合指引</h2>
-            <div className="text-sm sm:text-base text-cream/70 leading-loose space-y-4 whitespace-pre-line">
-              <p>{fullGuidanceText}</p>
-            </div>
-          </div>
-        )}
 
         {/* AI 塔罗师对话 */}
         {showAll && (
