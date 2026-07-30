@@ -1,5 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SPREADS } from '@/data/tarot-spreads';
 import { usePermission } from '@/hooks/usePermission';
@@ -7,63 +9,81 @@ import InviteCodeModal from '@/components/InviteCodeModal';
 
 export default function TarotPage() {
   const router = useRouter();
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>('three');
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { hasPermission, isLoading } = usePermission('tarot');
 
-  // 权限检查完成后，无权限则弹窗
   useEffect(() => {
-    if (!isLoading && !hasPermission) {
-      setShowInviteModal(true);
-    }
+    if (!isLoading && !hasPermission) setShowInviteModal(true);
   }, [isLoading, hasPermission]);
 
+  const selectedSpread = SPREADS.find((spread) => spread.id === selected);
+
   return (
-    <main className="min-h-screen bg-dark px-4 py-10 sm:px-8 sm:py-16">
-      <div className="mx-auto max-w-2xl">
-        <header className="mb-10 text-center">
-          <h1 className="text-3xl font-bold tracking-[0.3em] text-accent sm:text-4xl">塔罗占卜</h1>
-          <p className="mt-3 text-sm text-cream/50 tracking-wider">静心冥想，选择适合你的牌阵</p>
+    <main className="min-h-screen bg-dark text-cream">
+      <div className="editorial-shell">
+        <div className="editorial-topbar">
+          <Link href="/" className="brand-mark">
+            <span className="brand-mark__cn">星见</span>
+            <span className="brand-mark__en">XINGJIAN</span>
+          </Link>
+          <Link href="/" className="nav-link">返回首页</Link>
+        </div>
+
+        <header className="grid gap-8 border-b border-line py-14 md:grid-cols-[1.25fr_.75fr] md:items-end md:py-20">
+          <div>
+            <p className="page-kicker">SELECT A SPREAD</p>
+            <h1 className="page-title">先选择一个<br />看问题的角度。</h1>
+          </div>
+          <p className="page-subtitle md:max-w-sm md:justify-self-end">
+            不确定该选哪个？三牌阵适合大多数问题。问题越具体，牌面给你的镜像就越清晰。
+          </p>
         </header>
 
-        <section className="mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-            {SPREADS.map(s => {
-              const isSel = selected === s.id;
-              return (
-                <button key={s.id} onClick={() => setSelected(s.id)}
-                  className={`relative flex flex-col items-center rounded-xl border-2 p-4 sm:p-5 text-left transition-all duration-300 ${
-                    isSel ? 'border-accent bg-accent/10 scale-[1.03] shadow-[0_0_20px_rgba(196,153,76,0.25)]' : 'border-primary/50 bg-primary/40 hover:border-accent/60 hover:bg-primary/60'
-                  }`}>
-                  {s.id === 'celtic' && <span className="absolute -top-2 -right-2 text-[10px] bg-accent text-dark px-2 py-0.5 rounded-full font-bold">进阶</span>}
-                  <span className="text-lg font-semibold text-accent tracking-wider">{s.nameZh}</span>
-                  <span className="text-xs text-cream/40 mt-1">{s.cardCount}张牌</span>
-                  <span className="text-[11px] text-cream/50 mt-1.5 leading-snug text-center">{s.description}</span>
-                </button>
-              );
-            })}
-          </div>
+        <section className="grid border-b border-line md:grid-cols-2">
+          {SPREADS.map((spread, index) => {
+            const isSelected = spread.id === selected;
+            return (
+              <button
+                key={spread.id}
+                onClick={() => setSelected(spread.id)}
+                aria-pressed={isSelected}
+                className={`relative min-h-[210px] border-b border-line p-7 text-left transition-colors md:p-9 ${index % 2 === 0 ? 'md:border-r' : ''} ${isSelected ? 'bg-[#18140f]' : 'hover:bg-[#12100d]'}`}
+              >
+                <div className="flex items-start justify-between gap-6">
+                  <span className="font-serif text-xs text-muted">{String(index + 1).padStart(2, '0')}</span>
+                  <span className={`h-3 w-3 rounded-full border ${isSelected ? 'border-accent bg-accent' : 'border-[#51483f]'}`} />
+                </div>
+                <div className="mt-10 flex items-baseline justify-between gap-4">
+                  <h2 className="font-serif-cn text-2xl font-normal tracking-wide sm:text-3xl">{spread.nameZh}</h2>
+                  <span className="text-[10px] tracking-[.18em] text-accent">{spread.cardCount} CARDS</span>
+                </div>
+                <p className="mt-4 max-w-md text-xs leading-7 text-muted">{spread.description}</p>
+                {spread.id === 'celtic' && <span className="absolute bottom-7 right-7 text-[9px] tracking-[.16em] text-[#7e7368]">ADVANCED</span>}
+              </button>
+            );
+          })}
         </section>
 
-        {selected && (
-          <div className="flex justify-center animate-fadeInUp">
-            <button onClick={() => router.push(`/tarot/draw?spread=${selected}`)}
-              className="w-full rounded-full bg-gradient-to-r from-accent to-yellow-600 px-10 py-4 text-lg font-bold text-dark tracking-[0.2em] shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95 sm:w-auto sm:px-16">开始占卜</button>
-          </div>
-        )}
-
-        <footer className="mt-16 text-center">
-          <a href="/" className="text-sm text-cream/30 tracking-wider transition-colors hover:text-cream/60">← 返回首页</a>
-        </footer>
-
-        {/* 邀请码弹窗 */}
-        <InviteCodeModal
-          isOpen={showInviteModal}
-          onClose={() => setShowInviteModal(false)}
-          onSuccess={() => setShowInviteModal(false)}
-          requiredModule="tarot"
-        />
+        <div className="sticky bottom-0 z-10 -mx-4 flex flex-col gap-4 border-t border-line bg-[#0b0a08f2] px-4 py-5 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between md:static md:mx-0 md:border-t-0 md:bg-transparent md:px-0 md:py-9 md:backdrop-blur-none">
+          <p className="text-xs text-muted">
+            已选择 <span className="ml-2 text-cream">{selectedSpread?.nameZh}</span>
+          </p>
+          <button
+            onClick={() => router.push(`/tarot/draw?spread=${selected}`)}
+            className="button-primary w-full sm:w-auto"
+          >
+            带着问题，开始洗牌
+          </button>
+        </div>
       </div>
+
+      <InviteCodeModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        onSuccess={() => setShowInviteModal(false)}
+        requiredModule="tarot"
+      />
     </main>
   );
 }

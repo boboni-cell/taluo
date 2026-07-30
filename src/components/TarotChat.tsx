@@ -29,7 +29,7 @@ const QUICK_QUESTIONS = [
   '给我一个近期的行动建议',
 ];
 
-const WELCOME_MSG = '你好呀 ✨ 我是星见，刚刚看了你的牌面。有什么想问的吗？可以问我关于感情、事业、或者任何困惑的事情~';
+const WELCOME_MSG = '我是星见。刚刚看完你的牌面，如果还有没说透的地方，可以继续问我。感情、事业，或任何正在困扰你的事都可以。';
 
 /** 清理 AI 返回文本：移除 Markdown 格式，分段渲染 */
 function cleanMessage(text: string): React.ReactNode[] {
@@ -166,28 +166,25 @@ export default function TarotChat({ spreadName, cards }: Props) {
   };
 
   return (
-    <div className="mt-12 animate-fadeInUp">
-      <div className="mb-8 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+    <section className="mt-16 border-t border-line pt-12 animate-fadeInUp">
+      <p className="page-kicker">CONTINUE THE CONVERSATION</p>
+      <div className="mt-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+        <h2 className="font-serif-cn text-3xl font-normal">继续问星见</h2>
+        <p className="text-xs text-muted">针对这次牌面，你还可以问 {MAX_ROUNDS - userMsgCount} 个问题</p>
+      </div>
 
-      {/* 标题 */}
-      <h2 className="text-lg sm:text-xl font-bold text-accent mb-1 tracking-[0.15em]">✦ 星见 · AI 塔罗师</h2>
-      <p className="text-sm text-cream/50 mb-4">针对你的牌面，问我任何问题</p>
-
-      {/* 对话区 */}
-      <div className="bg-[#1A0F0A]/60 border border-accent/10 rounded-xl overflow-hidden">
-        <div className="max-h-[500px] overflow-y-auto overflow-x-hidden p-4 sm:p-5 space-y-4 chat-scroll">
+      <div className="mt-8 overflow-hidden border border-line bg-[#100e0b]">
+        <div className="chat-scroll max-h-[520px] space-y-5 overflow-x-hidden overflow-y-auto p-5 sm:p-7">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               {msg.role === 'assistant' && (
-                <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
-                  <span className="text-accent text-xs">✦</span>
-                </div>
+                <span className="mr-3 mt-3 text-[9px] tracking-[.14em] text-accent">星见</span>
               )}
               <div
-                className={`max-w-[85%] sm:max-w-[75%] rounded-xl px-4 py-3 text-sm leading-relaxed break-words overflow-wrap-anywhere ${
+                className={`max-w-[85%] break-words px-4 py-3 text-sm leading-7 sm:max-w-[75%] ${
                   msg.role === 'user'
-                    ? 'bg-accent/15 text-cream/80 border border-accent/20'
-                    : 'bg-[#2C1810] text-cream/75 border-l-2 border-accent/40'
+                    ? 'border border-[#5d4332] bg-[#1b1510] text-[#ddd5ca]'
+                    : 'border-l border-[#5d4332] bg-[#15120e] text-[#bfb7ac]'
                 }`}
               >
                 {cleanMessage(msg.content)}
@@ -198,12 +195,10 @@ export default function TarotChat({ spreadName, cards }: Props) {
           {/* 流式输出 */}
           {streaming && (
             <div className="flex justify-start">
-              <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
-                <span className="text-accent text-xs">✦</span>
-              </div>
-              <div className="max-w-[85%] sm:max-w-[75%] rounded-xl px-4 py-3 text-sm leading-relaxed bg-[#2C1810] text-cream/75 border-l-2 border-accent/40 whitespace-pre-wrap break-words overflow-x-hidden">
+              <span className="mr-3 mt-3 text-[9px] tracking-[.14em] text-accent">星见</span>
+              <div className="max-w-[85%] break-words overflow-x-hidden border-l border-[#5d4332] bg-[#15120e] px-4 py-3 text-sm leading-7 text-[#bfb7ac] sm:max-w-[75%]">
                 {streaming.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1')}
-                <span className="inline-block w-0.5 h-4 bg-accent ml-0.5 animate-pulse align-middle" />
+                <span className="ml-1 inline-block h-3 w-px animate-pulse bg-accent align-middle" />
               </div>
             </div>
           )}
@@ -211,15 +206,8 @@ export default function TarotChat({ spreadName, cards }: Props) {
           {/* loading */}
           {loading && !streaming && (
             <div className="flex justify-start">
-              <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center flex-shrink-0 mr-2 mt-1">
-                <span className="text-accent text-xs">✦</span>
-              </div>
-              <div className="rounded-xl px-4 py-3 bg-[#2C1810] border-l-2 border-accent/40">
-                <span className="text-accent/50 text-sm">星见正在解读</span>
-                <span className="inline-block animate-pulse text-accent/50">.</span>
-                <span className="inline-block animate-pulse text-accent/50" style={{ animationDelay: '0.3s' }}>.</span>
-                <span className="inline-block animate-pulse text-accent/50" style={{ animationDelay: '0.6s' }}>.</span>
-              </div>
+              <span className="mr-3 mt-3 text-[9px] tracking-[.14em] text-accent">星见</span>
+              <div className="border-l border-[#5d4332] bg-[#15120e] px-4 py-3 text-sm text-muted animate-pulse">正在整理回答</div>
             </div>
           )}
 
@@ -228,13 +216,13 @@ export default function TarotChat({ spreadName, cards }: Props) {
 
         {/* 快捷问题（首次对话） */}
         {userMsgCount === 0 && !loading && (
-          <div className="px-4 sm:px-5 pb-3">
+          <div className="border-t border-line px-5 py-4 sm:px-7">
             <div className="flex flex-wrap gap-2">
               {QUICK_QUESTIONS.map(q => (
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="text-xs text-accent/70 border border-accent/30 rounded-full px-3 py-1.5 hover:bg-accent/10 hover:text-accent transition-colors"
+                  className="border border-[#40372f] px-3 py-2 text-[11px] text-muted transition-colors hover:border-accent hover:text-cream"
                 >
                   {q}
                 </button>
@@ -244,19 +232,19 @@ export default function TarotChat({ spreadName, cards }: Props) {
         )}
 
         {/* 输入区 */}
-        <div className="border-t border-accent/10 p-3 sm:p-4">
+        <div className="border-t border-line p-4 sm:p-5">
           {reachedLimit ? (
-            <p className="text-center text-sm text-cream/40 py-2">
-              本次解读的对话已结束，再抽一次开启新的对话~
+            <p className="py-2 text-center text-sm text-muted">
+              本次对话已结束，再抽一次开启新的对话。
             </p>
           ) : (
             <>
               {userMsgCount >= MAX_ROUNDS - 2 && userMsgCount < MAX_ROUNDS && (
-                <p className="text-center text-xs text-accent/50 mb-2">
-                  还可以问 {MAX_ROUNDS - userMsgCount} 个问题哦
+                <p className="mb-3 text-center text-[10px] tracking-wider text-muted">
+                  还可以问 {MAX_ROUNDS - userMsgCount} 个问题
                 </p>
               )}
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <input
                   ref={inputRef}
                   type="text"
@@ -265,12 +253,12 @@ export default function TarotChat({ spreadName, cards }: Props) {
                   onKeyDown={handleKeyDown}
                   placeholder="问问星见..."
                   disabled={loading}
-                  className="flex-1 bg-[#2C1810] text-cream rounded-xl border border-accent/30 px-4 py-2.5 text-sm outline-none focus:border-accent transition-colors disabled:opacity-50 placeholder:text-cream/20"
+                  className="min-h-12 flex-1 border border-[#40372f] bg-[#0b0a08] px-4 text-sm text-cream outline-none transition-colors placeholder:text-[#5d554d] focus:border-accent disabled:opacity-50"
                 />
                 <button
                   onClick={() => sendMessage(input)}
                   disabled={loading || !input.trim()}
-                  className="rounded-xl bg-gradient-to-r from-accent to-yellow-600 text-dark font-bold px-5 py-2.5 text-sm tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                  className="button-primary min-w-24 disabled:cursor-not-allowed"
                 >
                   发送
                 </button>
@@ -279,6 +267,6 @@ export default function TarotChat({ spreadName, cards }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,88 +1,36 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { usePermission } from '@/hooks/usePermission';
 import InviteCodeModal from '@/components/InviteCodeModal';
+import { usePermission } from '@/hooks/usePermission';
+import { getCardImageUrl } from '@/data/tarot-images';
 
-// -------------------- useInView Hook --------------------
-
-function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, inView };
-}
-
-// -------------------- 数据 --------------------
-
-const testimonials = [
-  { text: '塔罗牌解读太准了，每次抽到的牌都让我深思。', author: '小红书用户 @星辰✨' },
-  { text: '和朋友一起测的，结果居然完全不同，好神奇！', author: '小红书用户 @月亮与六便士' },
-  { text: '界面好美，有种真的在占卜的仪式感。', author: '小红书用户 @慢慢来' },
-  { text: '五牌阵的解读很详细，比很多App都好用。', author: '小红书用户 @塔罗新手' },
+const readings = [
+  { id: 'single', index: '01', title: '一张牌', subtitle: '当下指引', copy: '把复杂的问题收束成一个清晰的提醒。' },
+  { id: 'three', index: '02', title: '三张牌', subtitle: '过去 · 现在 · 未来', copy: '沿着时间线，看清事情如何来到此刻。' },
+  { id: 'five', index: '03', title: '五张牌', subtitle: '深入洞察', copy: '从现状、阻力到行动建议，完整梳理局面。' },
 ];
 
-// -------------------- 子组件 --------------------
-
-function FadeIn({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const { ref, inView } = useInView();
-  return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
-// -------------------- 主页面 --------------------
+const principles = [
+  ['01', '不是预言', '牌不会替你决定未来，它只把你忽略的感受带到眼前。'],
+  ['02', '忠于此刻', '同一个问题在不同阶段，会照见完全不同的答案。'],
+  ['03', '行动优先', '每次解读都落到一条你真正可以开始的行动。'],
+];
 
 export default function HomePage() {
   const router = useRouter();
-  const [toastMsg, setToastMsg] = useState('');
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { hasPermission } = usePermission('tarot');
 
-  function showToast(msg: string) {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 2500);
-  }
-
-  function handleTarotClick() {
-    if (hasPermission) {
-      router.push('/tarot');
-    } else {
-      setShowInviteModal(true);
-    }
+  function enterTarot(path = '/tarot') {
+    if (hasPermission) router.push(path);
+    else setShowInviteModal(true);
   }
 
   return (
-    <main className="bg-dark text-cream overflow-hidden">
-
-      {/* ===== Toast ===== */}
-      {toastMsg && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-40 bg-primary/95 border border-accent text-accent px-6 py-3 rounded-full text-sm tracking-wider animate-fadeInUp">
-          {toastMsg}
-        </div>
-      )}
-
-      {/* 邀请码弹窗 */}
+    <main className="min-h-screen overflow-hidden bg-dark text-cream">
       <InviteCodeModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
@@ -90,157 +38,110 @@ export default function HomePage() {
         requiredModule="tarot"
       />
 
-      {/* ===== 1. Hero 区域 ===== */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 text-center">
-        {/* 装饰星 */}
-        <div className="mb-6 animate-[spin_8s_linear_infinite]">
-          <span className="text-4xl md:text-5xl text-accent">✦</span>
+      <header className="site-header">
+        <Link href="/" className="brand-mark" aria-label="星见首页">
+          <span className="brand-mark__cn">星见</span>
+          <span className="brand-mark__en">XINGJIAN</span>
+        </Link>
+        <nav className="hidden items-center gap-9 md:flex" aria-label="主页导航">
+          <a href="#readings" className="nav-link">选择牌阵</a>
+          <a href="#philosophy" className="nav-link">关于塔罗</a>
+          <button onClick={() => enterTarot()} className="nav-cta">开始占卜</button>
+        </nav>
+        <button onClick={() => enterTarot()} className="nav-cta md:hidden">开始</button>
+      </header>
+
+      <section className="hero-section">
+        <div className="hero-copy">
+          <p className="eyebrow">A QUIET MIRROR FOR YOUR INNER WORLD</p>
+          <h1 className="display-title mt-7">
+            答案不在牌里，
+            <span>在你心里。</span>
+          </h1>
+          <p className="hero-intro">
+            让塔罗成为一面镜子，照见此刻真正重要的事。
+            不替你预言，只陪你看清。
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-5">
+            <button onClick={() => enterTarot()} className="button-primary">开始一次占卜</button>
+            <a href="#readings" className="text-link">了解牌阵 <span aria-hidden="true">—</span></a>
+          </div>
+          <div className="hero-note">
+            <span>78</span>
+            <p>张经典韦特塔罗<br />一场只属于你的对话</p>
+          </div>
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-bold text-accent tracking-[0.15em]">
-          人格探索站
-        </h1>
-        <p className="mt-4 text-base md:text-lg text-cream/60 tracking-wider">
-          探索内心宇宙，遇见未知的自己
-        </p>
-
-        {/* 向下滚动箭头 */}
-        <div className="absolute bottom-8 animate-bounce">
-          <span className="text-2xl text-accent/40">↓</span>
+        <div className="hero-art" aria-label="三张经典塔罗牌：女祭司、星星和月亮">
+          <p className="hero-art__caption">THE CARDS REFLECT<br />WHAT YOU ALREADY KNOW</p>
+          {[2, 17, 18].map((id, index) => (
+            <div key={id} className={`hero-card hero-card--${index + 1}`}>
+              <img src={getCardImageUrl(id) || ''} alt={['女祭司', '星星', '月亮'][index]} />
+            </div>
+          ))}
+          <span className="hero-art__edition">VOL. 01 / 2026</span>
         </div>
       </section>
 
-      {/* ===== 2. 核心模块入口 ===== */}
-      <FadeIn>
-        <section className="py-16 md:py-24 px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-center text-xl md:text-2xl text-cream/80 tracking-widest mb-10">
-              选择你的探索方式
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 塔罗占卜卡片 */}
-              <button onClick={handleTarotClick} className="group block w-full text-left">
-                <div className="h-full rounded-2xl border-2 border-accent/40 bg-primary/60 p-6 md:p-8 transition-all duration-300 group-hover:border-accent group-hover:-translate-y-1 group-hover:shadow-[0_0_30px_rgba(196,153,76,0.2)]">
-                  <span className="text-4xl">🔮</span>
-                  <h3 className="mt-4 text-xl md:text-2xl font-bold text-accent tracking-wider">塔罗占卜</h3>
-                  <p className="mt-3 text-sm text-cream/60 leading-relaxed">抽取属于你的塔罗牌，解读命运的指引</p>
-                  <div className="mt-4 inline-block rounded-full border border-accent/30 px-3 py-1 text-xs text-accent/70">
-                    事业 · 财运 · 桃花
-                  </div>
-                </div>
-              </button>
-
-              {/* 人格测试卡片（即将上线） */}
-              <button
-                onClick={() => showToast('人格测试模块即将上线，敬请期待')}
-                className="group block text-left w-full opacity-70 cursor-default"
-              >
-                <div className="h-full rounded-2xl border-2 border-accent/20 bg-primary/40 p-6 md:p-8 relative">
-                  {/* 锁标记 */}
-                  <span className="absolute top-4 right-4 text-accent/40 text-lg">🔒</span>
-                  <span className="absolute top-4 right-12 text-[10px] text-accent/40 border border-accent/20 rounded-full px-2 py-0.5">
-                    即将上线
-                  </span>
-                  <span className="text-4xl grayscale">🧠</span>
-                  <h3 className="mt-4 text-xl md:text-2xl font-bold text-cream/40 tracking-wider">人格测试</h3>
-                  <p className="mt-3 text-sm text-cream/30 leading-relaxed">深入了解你的性格密码与行为模式</p>
-                  <div className="mt-4 inline-block rounded-full border border-accent/15 px-3 py-1 text-xs text-cream/30">
-                    MBTI · 依恋类型 · 情感模式
-                  </div>
-                </div>
-              </button>
-            </div>
+      <section id="readings" className="content-section border-t border-line">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">CHOOSE YOUR READING</p>
+            <h2>选择你的方式</h2>
           </div>
-        </section>
-      </FadeIn>
+          <p>无需懂牌。只要带着一个真实的问题，<br className="hidden sm:block" />剩下的交给直觉。</p>
+        </div>
 
-      {/* ===== 3. 热门推荐区 ===== */}
-      <FadeIn>
-        <section className="py-16 md:py-24 px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-center text-xl md:text-2xl text-cream/80 tracking-widest mb-10">
-              热门体验
-            </h2>
+        <div className="reading-list">
+          {readings.map((reading) => (
+            <button
+              key={reading.id}
+              onClick={() => enterTarot(`/tarot/draw?spread=${reading.id}`)}
+              className="reading-row group"
+            >
+              <span className="reading-row__index">{reading.index}</span>
+              <span className="reading-row__title">{reading.title}</span>
+              <span className="reading-row__subtitle">{reading.subtitle}</span>
+              <span className="reading-row__copy">{reading.copy}</span>
+              <span className="reading-row__action">选择</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* 三牌阵 */}
-              <Link href="/tarot?spread=3" className="group">
-                <div className="rounded-xl bg-primary/40 border border-accent/20 p-5 text-center transition-all duration-300 group-hover:border-accent/60 group-hover:bg-primary/60">
-                  <span className="text-2xl">🌟</span>
-                  <h4 className="mt-2 text-accent font-semibold tracking-wider">三牌阵占卜</h4>
-                  <p className="mt-1 text-xs text-cream/50">过去·现在·未来</p>
-                </div>
-              </Link>
-
-              {/* 单牌 */}
-              <Link href="/tarot?spread=1" className="group">
-                <div className="rounded-xl bg-primary/40 border border-accent/20 p-5 text-center transition-all duration-300 group-hover:border-accent/60 group-hover:bg-primary/60">
-                  <span className="text-2xl">🃏</span>
-                  <h4 className="mt-2 text-accent font-semibold tracking-wider">单牌快速占卜</h4>
-                  <p className="mt-1 text-xs text-cream/50">一张牌直指核心</p>
-                </div>
-              </Link>
-
-              {/* 隐藏人格测试 */}
-              <button onClick={() => showToast('隐藏人格测试即将上线')} className="group cursor-default">
-                <div className="rounded-xl bg-primary/20 border border-accent/10 p-5 text-center opacity-60">
-                  <span className="text-2xl grayscale">🧩</span>
-                  <h4 className="mt-2 text-cream/40 font-semibold tracking-wider">隐藏人格测试</h4>
-                  <p className="mt-1 text-xs text-cream/30">免费趣味测试 · 即将上线</p>
-                </div>
-              </button>
-            </div>
+      <section id="philosophy" className="content-section border-t border-line">
+        <div className="philosophy-grid">
+          <div className="philosophy-intro">
+            <p className="eyebrow">OUR PHILOSOPHY</p>
+            <h2>看见，<br />然后选择。</h2>
+            <p>塔罗最有价值的时刻，不是它说中了什么，而是你终于听见了自己。</p>
           </div>
-        </section>
-      </FadeIn>
-
-      {/* ===== 4. 用户评价区 ===== */}
-      <FadeIn>
-        <section className="py-16 md:py-24 px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-center text-xl md:text-2xl text-cream/80 tracking-widest mb-10">
-              他们说
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {testimonials.map((t, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl bg-primary/20 border border-accent/10 p-5 relative"
-                >
-                  {/* 引号装饰 */}
-                  <span className="absolute -top-2 -left-1 text-3xl text-accent/15 select-none">&ldquo;</span>
-                  <p className="text-sm text-cream/70 leading-relaxed pt-2">{t.text}</p>
-                  <p className="mt-3 text-xs text-cream/40">— {t.author}</p>
-                </div>
-              ))}
-            </div>
+          <div className="principle-list">
+            {principles.map(([index, title, copy]) => (
+              <div key={index} className="principle-row">
+                <span>{index}</span>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </div>
+            ))}
           </div>
-        </section>
-      </FadeIn>
+        </div>
+      </section>
 
-      {/* ===== 5. 底部引导区 ===== */}
-      <FadeIn>
-        <section className="py-16 md:py-20 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            {/* 金色分割线 */}
-            <div className="w-24 h-px bg-gradient-to-r from-transparent via-accent to-transparent mx-auto mb-8" />
+      <section className="quote-section">
+        <p className="eyebrow">A NOTE FROM A READER</p>
+        <blockquote>“它没有告诉我一个标准答案，<br />却让我第一次把问题问对了。”</blockquote>
+        <cite>— 星见使用者，首尔</cite>
+      </section>
 
-            <p className="text-sm text-cream/50 tracking-wider">
-              关注小红书获取邀请码，解锁更多功能
-            </p>
-            <p className="mt-2 text-accent/60 text-sm tracking-widest">
-              @你的小红书账号
-            </p>
-
-            <p className="mt-12 text-xs text-cream/20">
-              &copy; 2025 人格探索站 · 仅供娱乐参考
-            </p>
-          </div>
-        </section>
-      </FadeIn>
-
+      <footer className="site-footer">
+        <Link href="/" className="brand-mark">
+          <span className="brand-mark__cn">星见</span>
+          <span className="brand-mark__en">XINGJIAN</span>
+        </Link>
+        <p>关注小红书获取邀请码 · @你的小红书账号</p>
+        <p>© 2026 星见 · 仅供自我探索与娱乐参考</p>
+      </footer>
     </main>
   );
 }

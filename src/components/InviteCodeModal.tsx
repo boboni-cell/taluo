@@ -92,120 +92,61 @@ export default function InviteCodeModal({ isOpen, onClose, onSuccess, requiredMo
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* ---- 遮罩层 ---- */}
-      <div
-        className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fadeIn overflow-y-auto"
-        onClick={onClose}
-      >
-        {/* ---- 弹窗容器 ---- */}
-        <div className="min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div
-            className={`
-              w-full sm:max-w-[420px] sm:rounded-2xl rounded-t-2xl
-              bg-[#1A0F0A] border border-accent/30 sm:border-accent/40
-              shadow-2xl shadow-black/50
-              animate-modalIn
-            `}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* ---- 顶部拖拽条（手机端） ---- */}
-            <div className="sm:hidden flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-cream/20" />
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
+      <div className="flex min-h-full items-end justify-center sm:items-center sm:p-5">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="invite-title"
+          className="w-full border border-line bg-[#12100d] p-7 shadow-2xl shadow-black/60 animate-modalIn sm:max-w-[470px] sm:p-10"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="mb-10 flex items-start justify-between border-b border-line pb-5">
+            <div>
+              <p className="page-kicker">PRIVATE ACCESS</p>
+              <p className="mt-2 text-[10px] tracking-[.14em] text-muted">星见内测邀请</p>
             </div>
-
-            {/* ====== 成功状态 ====== */}
-            {successMsg ? (
-              <div className="px-6 py-10 sm:py-12 text-center">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-green-400/10 border border-green-400/30 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" className="animate-checkDraw" />
-                  </svg>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-green-400 mb-3 tracking-wider">
-                  {successMsg}
-                </h2>
-                <p className="text-sm text-cream/60">
-                  已解锁：{newPerms.join('、') || '全部功能'}
-                </p>
-              </div>
-            ) : (
-              /* ====== 输入状态 ====== */
-              <div className="px-6 py-8 sm:py-10">
-                {/* 标题 */}
-                <h2 className="text-xl sm:text-2xl font-bold text-accent text-center tracking-[0.15em] mb-2">
-                  请输入邀请码
-                </h2>
-
-                {/* 副标题 */}
-                <p className="text-sm text-cream/50 text-center mb-6">
-                  关注小红书 @你的账号名 获取邀请码{requiredModule ? `（${requiredModule === 'tarot' ? '塔罗占卜' : requiredModule} 模块需要激活后才能使用）` : ''}
-                </p>
-
-                {/* 输入框区域 */}
-                <div className={shake ? 'animate-shake' : ''}>
-                  <input
-                    type="text"
-                    value={code}
-                    onChange={handleInput}
-                    onKeyDown={handleKeyDown}
-                    placeholder="请输入邀请码"
-                    disabled={loading}
-                    autoFocus
-                    className={`
-                      w-full bg-[#2C1810] text-cream text-lg text-center tracking-[0.3em]
-                      rounded-xl border-2 px-6 py-4
-                      placeholder:text-cream/20
-                      outline-none transition-colors duration-200
-                      disabled:opacity-50
-                      ${error
-                        ? 'border-red-400/60 focus:border-red-400'
-                        : 'border-accent/40 focus:border-accent'
-                      }
-                    `}
-                  />
-
-                  {/* 错误提示 */}
-                  {error && (
-                    <p className="text-sm text-red-400/80 text-center mt-3 animate-fadeIn">
-                      {error}
-                    </p>
-                  )}
-                </div>
-
-                {/* 激活按钮 */}
-                <button
-                  onClick={handleActivate}
-                  disabled={loading || !code.trim()}
-                  className={`
-                    w-full mt-5 rounded-xl py-4 text-base font-bold tracking-[0.2em]
-                    transition-all duration-200
-                    disabled:opacity-40 disabled:cursor-not-allowed
-                    ${loading
-                      ? 'bg-accent/30 text-accent/50'
-                      : 'bg-gradient-to-r from-accent to-yellow-600 text-dark hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-accent/10'
-                    }
-                  `}
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <span className="w-5 h-5 border-2 border-accent/50 border-t-accent rounded-full animate-spin" />
-                      验证中…
-                    </span>
-                  ) : (
-                    '激活'
-                  )}
-                </button>
-
-                {/* 底部提示 */}
-                <p className="text-xs text-cream/25 text-center mt-5">
-                  每个邀请码仅限一次使用
-                </p>
-              </div>
-            )}
+            <button onClick={onClose} className="text-xs tracking-[.14em] text-muted transition-colors hover:text-cream">关闭</button>
           </div>
+
+          {successMsg ? (
+            <div className="py-8 text-center">
+              <p className="page-kicker text-[#8fa07a]">ACCESS GRANTED</p>
+              <h2 id="invite-title" className="mt-5 font-serif-cn text-4xl font-normal">已解锁</h2>
+              <p className="mt-4 text-sm text-muted">{newPerms.join('、') || '全部功能'} 已可使用</p>
+            </div>
+          ) : (
+            <div>
+              <h2 id="invite-title" className="font-serif-cn text-4xl font-normal leading-tight">输入邀请码，<br />开始你的解读。</h2>
+              <p className="mt-5 text-sm leading-7 text-muted">
+                关注小红书 @你的账号名 获取邀请码
+                {requiredModule ? `。激活后即可使用${requiredModule === 'tarot' ? '塔罗占卜' : requiredModule}。` : '。'}
+              </p>
+
+              <div className={`mt-8 ${shake ? 'animate-shake' : ''}`}>
+                <label htmlFor="invite-code" className="mb-3 block text-[10px] tracking-[.18em] text-[#9d9489]">INVITATION CODE</label>
+                <input
+                  id="invite-code"
+                  type="text"
+                  value={code}
+                  onChange={handleInput}
+                  onKeyDown={handleKeyDown}
+                  placeholder="输入邀请码"
+                  disabled={loading}
+                  autoFocus
+                  className={`w-full border bg-[#0b0a08] px-5 py-4 text-base tracking-[.22em] text-cream outline-none transition-colors placeholder:text-[#534c44] disabled:opacity-50 ${error ? 'border-[#9e5e50]' : 'border-[#403930] focus:border-accent'}`}
+                />
+                {error && <p className="mt-3 text-xs text-[#c77d6a] animate-fadeIn">{error}</p>}
+              </div>
+
+              <button onClick={handleActivate} disabled={loading || !code.trim()} className="button-primary mt-5 w-full">
+                {loading ? '正在验证…' : '验证并进入'}
+              </button>
+              <p className="mt-5 text-center text-[10px] tracking-[.08em] text-[#625b53]">每个邀请码仅限一次使用</p>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

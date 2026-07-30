@@ -9,11 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // 塔罗占卜屋自定义配色
-        primary: '#2C1810',    // 深棕 - 主色调
-        accent: '#C4994C',     // 金色 - 强调色
-        cream: '#F5F0E8',      // 米白 - 浅色背景
-        dark: '#1A0F0A',       // 深色背景
+        primary: '#17130F',
+        accent: '#B97843',
+        starlight: '#9C7E72',
+        cream: '#F0EADF',
+        muted: '#918A80',
+        dark: '#0B0A08',
+        ink: '#0B0A08',
+        line: '#2B2722',
         // Tailwind 原有扩展
         background: "var(--background)",
         foreground: "var(--foreground)",

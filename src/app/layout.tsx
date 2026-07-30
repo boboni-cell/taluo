@@ -1,24 +1,15 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "塔罗占卜屋 - 在线塔罗牌占卜",
-  description: "选择你想问的问题，抽取属于你的牌。免费在线塔罗占卜，事业、财运、桃花一探究竟。",
+  title: '星见｜在线塔罗与自我探索',
+  description: '让塔罗成为一面镜子，照见此刻真正重要的事。',
 };
 
-/**
- * 根布局 - 全局字体、样式和元数据
- */
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body className="min-h-screen bg-dark text-cream antialiased">
-        {children}
-      </body>
+      <body className="min-h-screen bg-dark text-cream antialiased">{children}</body>
     </html>
   );
 }
