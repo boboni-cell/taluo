@@ -14,8 +14,15 @@ export default function TarotPage() {
   const { hasPermission, isLoading } = usePermission('tarot');
 
   useEffect(() => {
-    if (!isLoading && !hasPermission) setShowInviteModal(true);
-  }, [isLoading, hasPermission]);
+    const requested = new URLSearchParams(window.location.search).get('spread');
+    if (requested && SPREADS.some((spread) => spread.id === requested)) setSelected(requested);
+  }, []);
+
+  function startReading() {
+    if (isLoading) return;
+    if (hasPermission) router.push(`/tarot/draw?spread=${selected}`);
+    else setShowInviteModal(true);
+  }
 
   const selectedSpread = SPREADS.find((spread) => spread.id === selected);
 
@@ -70,10 +77,11 @@ export default function TarotPage() {
             已选择 <span className="ml-2 text-cream">{selectedSpread?.nameZh}</span>
           </p>
           <button
-            onClick={() => router.push(`/tarot/draw?spread=${selected}`)}
+            onClick={startReading}
+            disabled={isLoading}
             className="button-primary w-full sm:w-auto"
           >
-            带着问题，开始洗牌
+            {isLoading ? '正在确认权限…' : '带着问题，开始洗牌'}
           </button>
         </div>
       </div>
@@ -81,7 +89,7 @@ export default function TarotPage() {
       <InviteCodeModal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
-        onSuccess={() => setShowInviteModal(false)}
+        onSuccess={() => router.push(`/tarot/draw?spread=${selected}`)}
         requiredModule="tarot"
       />
     </main>

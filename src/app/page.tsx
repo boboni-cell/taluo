@@ -1,10 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import InviteCodeModal from '@/components/InviteCodeModal';
-import { usePermission } from '@/hooks/usePermission';
 import { getCardImageUrl } from '@/data/tarot-images';
 
 const readings = [
@@ -21,23 +18,9 @@ const principles = [
 
 export default function HomePage() {
   const router = useRouter();
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const { hasPermission } = usePermission('tarot');
-
-  function enterTarot(path = '/tarot') {
-    if (hasPermission) router.push(path);
-    else setShowInviteModal(true);
-  }
 
   return (
     <main className="min-h-screen overflow-hidden bg-dark text-cream">
-      <InviteCodeModal
-        isOpen={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-        onSuccess={() => router.push('/tarot')}
-        requiredModule="tarot"
-      />
-
       <header className="site-header">
         <Link href="/" className="brand-mark" aria-label="星见首页">
           <span className="brand-mark__cn">星见</span>
@@ -46,9 +29,9 @@ export default function HomePage() {
         <nav className="hidden items-center gap-9 md:flex" aria-label="主页导航">
           <a href="#readings" className="nav-link">选择牌阵</a>
           <a href="#philosophy" className="nav-link">关于塔罗</a>
-          <button onClick={() => enterTarot()} className="nav-cta">开始占卜</button>
+          <button onClick={() => router.push('/tarot')} className="nav-cta">开始占卜</button>
         </nav>
-        <button onClick={() => enterTarot()} className="nav-cta md:hidden">开始</button>
+        <button onClick={() => router.push('/tarot')} className="nav-cta md:hidden">开始</button>
       </header>
 
       <section className="hero-section">
@@ -63,7 +46,7 @@ export default function HomePage() {
             不替你预言，只陪你看清。
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-5">
-            <button onClick={() => enterTarot()} className="button-primary">开始一次占卜</button>
+            <button onClick={() => router.push('/tarot')} className="button-primary">开始一次占卜</button>
             <a href="#readings" className="text-link">了解牌阵 <span aria-hidden="true">—</span></a>
           </div>
           <div className="hero-note">
@@ -96,7 +79,7 @@ export default function HomePage() {
           {readings.map((reading) => (
             <button
               key={reading.id}
-              onClick={() => enterTarot(`/tarot/draw?spread=${reading.id}`)}
+              onClick={() => router.push(`/tarot?spread=${reading.id}`)}
               className="reading-row group"
             >
               <span className="reading-row__index">{reading.index}</span>
