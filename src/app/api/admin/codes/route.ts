@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     };
     const permissions = body.permissions || ['tarot'];
     const count = Math.min(body.count || 10, 100);
-    const maxUses = body.maxUses || 1;
+    const maxUses = body.maxUses ?? 30;
     const expiresAt = body.expiresAt || null;
     const note = body.note || null;
     const db = getDB() as unknown as D1DB;

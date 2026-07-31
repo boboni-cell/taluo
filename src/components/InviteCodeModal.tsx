@@ -142,7 +142,6 @@ export default function InviteCodeModal({ isOpen, onClose, onSuccess, requiredMo
               <button onClick={handleActivate} disabled={loading || !code.trim()} className="button-primary mt-5 w-full">
                 {loading ? '正在验证…' : '验证并进入'}
               </button>
-              <p className="mt-5 text-center text-[10px] tracking-[.08em] text-[#625b53]">每个邀请码仅限一次使用</p>
             </div>
           )}
         </div>

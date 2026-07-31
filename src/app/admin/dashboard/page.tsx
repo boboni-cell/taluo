@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const [showGen, setShowGen] = useState(false);
   const [genPerms, setGenPerms] = useState<string[]>(['tarot']);
   const [genCount, setGenCount] = useState(10);
-  const [genMaxUses, setGenMaxUses] = useState(1);
+  const [genMaxUses, setGenMaxUses] = useState(30);
   const [genExpiry, setGenExpiry] = useState('');
   const [genExpiryDate, setGenExpiryDate] = useState('');
   const [genNote, setGenNote] = useState('');

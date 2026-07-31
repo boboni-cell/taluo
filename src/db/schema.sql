@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS invite_codes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   code TEXT NOT NULL UNIQUE,              -- 邀请码字符串（如 TR-A8X2K9M1）
   status TEXT DEFAULT 'unused',           -- unused | activated | expired | revoked
-  max_uses INTEGER DEFAULT 1,             -- 最大可使用次数（null 表示无限）
+  max_uses INTEGER DEFAULT 30,            -- 最大可使用次数（默认 30 次）
   used_count INTEGER DEFAULT 0,           -- 已被激活次数
   expires_at TEXT,                        -- 过期时间 ISO8601（null 表示永久有效）
   note TEXT,                              -- 备注（如 "小红书用户@xxx"）
