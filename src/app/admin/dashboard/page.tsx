@@ -42,6 +42,8 @@ export default function DashboardPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [filterStatus, setFilterStatus] = useState('');
   const [toast, setToast] = useState('');
+  const [inviteRequired, setInviteRequired] = useState(true);
+  const [accessLoading, setAccessLoading] = useState(true);
 
   // 生成弹窗
   const [showGen, setShowGen] = useState(false);
@@ -64,6 +66,7 @@ export default function DashboardPage() {
     setToken(t);
     loadCodes(t, 1, '');
     loadModules();
+    loadAccessMode();
   }, []);
 
   async function loadCodes(token: string, p: number, status: string) {
@@ -93,6 +96,50 @@ export default function DashboardPage() {
 
   async function loadModules() {
     try { setModules([{ id: 'tarot', name_zh: '塔罗占卜' }, { id: 'personality', name_zh: '人格类型测试' }, { id: 'emotion', name_zh: '情感模式测试' }, { id: 'relationship', name_zh: '人际关系测试' }, { id: 'inner', name_zh: '内在探索测试' }, { id: 'deep_report', name_zh: '深度报告' }, { id: 'vip', name_zh: '全部权限' }]); } catch {}
+  }
+
+  async function loadAccessMode() {
+    setAccessLoading(true);
+    try {
+      const res = await fetch('/api/access-mode', { cache: 'no-store' });
+      const data = await res.json();
+      if (res.ok) setInviteRequired(data.inviteRequired !== false);
+      else showToast(data.error || '读取访问设置失败');
+    } catch {
+      showToast('读取访问设置失败');
+    } finally {
+      setAccessLoading(false);
+    }
+  }
+
+  async function toggleAccessMode() {
+    const t = localStorage.getItem('adminToken');
+    if (!t || accessLoading) return;
+    const nextValue = !inviteRequired;
+    setAccessLoading(true);
+    try {
+      const res = await fetch('/api/access-mode', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` },
+        body: JSON.stringify({ inviteRequired: nextValue }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) {
+          localStorage.removeItem('adminToken');
+          router.push('/admin');
+          return;
+        }
+        showToast(data.error || '更新访问设置失败');
+        return;
+      }
+      setInviteRequired(data.inviteRequired);
+      showToast(data.inviteRequired ? '已开启邀请码验证' : '已关闭邀请码验证，访客可直接使用');
+    } catch {
+      showToast('更新访问设置失败');
+    } finally {
+      setAccessLoading(false);
+    }
   }
 
   const refresh = useCallback(() => {
@@ -158,9 +205,24 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-dark px-4 py-6 sm:px-8 sm:py-10">
       <div className="max-w-6xl mx-auto">
         {/* header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between gap-4 mb-8">
           <h1 className="text-xl sm:text-2xl font-bold text-accent tracking-[0.15em]">✦ 后台管理</h1>
-          <button onClick={handleLogout} className="text-sm text-cream/40 hover:text-red-400 transition-colors">退出登录</button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleAccessMode}
+              disabled={accessLoading}
+              aria-pressed={inviteRequired}
+              className={`rounded-full border px-4 py-2 text-xs font-medium tracking-wider transition-colors disabled:cursor-wait disabled:opacity-50 ${
+                inviteRequired
+                  ? 'border-accent/50 bg-accent/15 text-accent hover:bg-accent/25'
+                  : 'border-green-400/40 bg-green-400/10 text-green-300 hover:bg-green-400/20'
+              }`}
+            >
+              {accessLoading ? '读取中…' : `邀请码验证：${inviteRequired ? '已开启' : '已关闭'}`}
+            </button>
+            <button onClick={handleLogout} className="text-sm text-cream/40 hover:text-red-400 transition-colors">退出登录</button>
+          </div>
         </div>
 
         {/* stats cards */}

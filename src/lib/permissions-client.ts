@@ -75,6 +75,16 @@ export async function fetchPermissions(): Promise<PermissionsResponse> {
  * 检查是否拥有指定权限
  */
 export async function checkPermission(moduleId: string): Promise<boolean> {
+  try {
+    const accessResponse = await fetch('/api/access-mode', { cache: 'no-store' });
+    if (accessResponse.ok) {
+      const accessMode = (await accessResponse.json()) as { inviteRequired?: boolean };
+      if (accessMode.inviteRequired === false) return true;
+    }
+  } catch {
+    // 设置读取失败时保持安全默认值，继续检查邀请码权限
+  }
+
   const data = await fetchPermissions();
   return data.permissions.includes(moduleId);
 }

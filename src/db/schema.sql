@@ -76,3 +76,13 @@ CREATE TABLE IF NOT EXISTS admins (
   password_hash TEXT NOT NULL,            -- bcrypt 哈希
   created_at TEXT DEFAULT (datetime('now'))
 );
+
+-- 全局站点设置
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- 默认开启邀请码访问，保持现有行为
+INSERT OR IGNORE INTO app_settings (key, value) VALUES ('invite_required', 'true');
