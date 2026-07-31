@@ -4,6 +4,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // ogl 是源码包，需要被 Next.js 转译
+  transpilePackages: ['ogl'],
 };
 
 // Cloudflare 本地开发：注入 D1 等 bindings 到 process.env
