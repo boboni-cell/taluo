@@ -10,6 +10,14 @@ const readings = [
   { id: 'five', index: '03', title: '五张牌', subtitle: '深入洞察', copy: '从现状、阻力到行动建议，完整梳理局面。' },
 ];
 
+const testCategories = [
+  { id: 'personality', index: '01', title: '人格类型', subtitle: 'Personality Type', copy: '了解你的天生倾向与认知模式，看清自己如何理解世界。', count: 4 },
+  { id: 'emotion', index: '02', title: '情感模式', subtitle: 'Emotional Pattern', copy: '探索你的依恋风格与情感需求，理解爱中的自己。', count: 4 },
+  { id: 'relationship', index: '03', title: '人际关系', subtitle: 'Relationship', copy: '看见你与他人的互动方式，找到更舒适的相处边界。', count: 4 },
+  { id: 'inner', index: '04', title: '内在探索', subtitle: 'Inner Exploration', copy: '深入内心深处，理解自我价值、情绪与真实需求。', count: 4 },
+  { id: 'fun', index: '05', title: '趣味测试', subtitle: 'Just for Fun', copy: '轻松有趣的心理小测试，发现你不为人知的一面。', count: 4 },
+];
+
 const principles = [
   ['01', '不是预言', '牌不会替你决定未来，它只把你忽略的感受带到眼前。'],
   ['02', '忠于此刻', '同一个问题在不同阶段，会照见完全不同的答案。'],
@@ -28,6 +36,7 @@ export default function HomePage() {
         </Link>
         <nav className="hidden items-center gap-9 md:flex" aria-label="主页导航">
           <a href="#readings" className="nav-link">选择牌阵</a>
+          <a href="#tests" className="nav-link">心理测试</a>
           <a href="#philosophy" className="nav-link">关于塔罗</a>
           <button onClick={() => router.push('/tarot')} className="nav-cta">开始占卜</button>
         </nav>
@@ -87,6 +96,32 @@ export default function HomePage() {
               <span className="reading-row__subtitle">{reading.subtitle}</span>
               <span className="reading-row__copy">{reading.copy}</span>
               <span className="reading-row__action">选择</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section id="tests" className="content-section border-t border-line">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">KNOW YOURSELF DEEPER</p>
+            <h2>探索你的<br />内在世界</h2>
+          </div>
+          <p>科学心理测评，帮你理解人格、情感与关系。<br className="hidden sm:block" />每一次测试，都是一次自我发现。</p>
+        </div>
+
+        <div className="reading-list">
+          {testCategories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => router.push(`/tests?category=${cat.id}`)}
+              className="reading-row group"
+            >
+              <span className="reading-row__index">{cat.index}</span>
+              <span className="reading-row__title">{cat.title}</span>
+              <span className="reading-row__subtitle">{cat.subtitle}</span>
+              <span className="reading-row__copy">{cat.copy}</span>
+              <span className="reading-row__action">查看测试</span>
             </button>
           ))}
         </div>
